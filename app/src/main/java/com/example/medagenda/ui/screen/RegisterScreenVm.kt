@@ -6,6 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.medagenda.data.local.entity.Usuario
+import com.example.medagenda.domain.repository.UsuarioRepository
 import com.example.medagenda.domain.validation.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -36,6 +38,7 @@ sealed class ValidationEvent {
 }
 
 class RegisterScreenVm(
+    private val usuarioRepository: UsuarioRepository,
     private val validateNombre: ValidateNombre = ValidateNombre(),
     private val validateApellido: ValidateApellido = ValidateApellido(),
     private val validateRut: ValidateRut = ValidateRut(),
@@ -123,7 +126,17 @@ class RegisterScreenVm(
             )
             return
         }
+        
         viewModelScope.launch {
+            val newUser = Usuario(
+                rut = state.rut,
+                nombre = state.nombre,
+                apellido = state.apellido,
+                email = state.email,
+                telefono = state.telefono,
+                contrasenaHash = state.password // TODO: Hash the password
+            )
+            usuarioRepository.registerUser(newUser)
             validationEventChannel.send(ValidationEvent.Success)
         }
     }

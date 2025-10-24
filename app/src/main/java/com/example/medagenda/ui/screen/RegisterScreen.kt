@@ -36,16 +36,17 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import coil.compose.rememberAsyncImagePainter
 import com.example.medagenda.BuildConfig
+import com.example.medagenda.di.ViewModelFactory
 import java.io.File
 
 @Composable
 fun RegisterScreen(
     onRegisterOkNavigateToLogin: () -> Unit, // Navega a Login si el registro es OK
     onGoLogin: () -> Unit, // Navega a la pantalla de Login
-    registerScreenVm: RegisterScreenVm = viewModel()
 ) {
-    val state = registerScreenVm.state
     val context = LocalContext.current
+    val registerScreenVm: RegisterScreenVm = viewModel(factory = ViewModelFactory(context))
+    val state = registerScreenVm.state
 
     // --- Lógica para la cámara ---
     val file = File(context.cacheDir, "picture.jpg")
