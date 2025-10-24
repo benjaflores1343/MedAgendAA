@@ -1,4 +1,4 @@
-package com.example.medagenda.ui.screen
+package com.example.medagenda.domain.validation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
