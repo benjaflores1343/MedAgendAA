@@ -1,25 +1,37 @@
 package com.example.medagenda.navigation
 
-// Clase sellada para rutas: evita "strings mágicos" y facilita refactors
-sealed class Route(val definition: String) { // Cada objeto representa una pantalla
-    data object Login    : Route("login")    // Ruta Login
-    data object Register : Route("register") // Ruta Registro
-    data object RequestAppointment : Route("request_appointment") // Ruta para solicitar cita
+sealed class Route(val definition: String) {
+    data object Login : Route("login")
+    data object Register : Route("register")
 
-    // Home es especial porque necesita argumentos.
-    // `definition` contiene el patrón para el NavGraph.
-    // La función `build` crea la ruta específica para navegar.
-    data object Home : Route("home/{userName}/{userRole}") {
-        fun build(userName: String, userRole: String): String {
+    data object Home : Route("home/{userName}/{userRole}/{pacienteId}") {
+        fun build(userName: String, userRole: String, pacienteId: Long): String {
             return definition
                 .replace("{userName}", userName)
                 .replace("{userRole}", userRole)
+                .replace("{pacienteId}", pacienteId.toString())
+        }
+    }
+
+    data object RequestAppointment : Route("request_appointment/{pacienteId}") {
+        fun build(pacienteId: Long): String {
+            return definition.replace("{pacienteId}", pacienteId.toString())
+        }
+    }
+
+    data object SelectDoctor : Route("select_doctor/{specialtyId}/{pacienteId}") {
+        fun build(specialtyId: Long, pacienteId: Long): String {
+            return definition
+                .replace("{specialtyId}", specialtyId.toString())
+                .replace("{pacienteId}", pacienteId.toString())
+        }
+    }
+
+    data object SelectTimeSlot : Route("select_time_slot/{medicoId}/{pacienteId}") {
+        fun build(medicoId: Long, pacienteId: Long): String {
+            return definition
+                .replace("{medicoId}", medicoId.toString())
+                .replace("{pacienteId}", pacienteId.toString())
         }
     }
 }
-
-/*
-* “Strings mágicos” se refiere a cuando pones un texto duro y repetido en varias partes del código,
-* Si mañana cambias "home" por "inicio", tendrías que buscar todas las ocurrencias de "home" a mano.
-* Eso es frágil y propenso a errores.
-La idea es: mejor centralizar esos strings en una sola clase (Route), y usarlos desde ahí.*/

@@ -33,8 +33,8 @@ import com.example.medagenda.di.ViewModelFactory
 
 @Composable
 fun LoginScreen(
-    onLoginOkNavigateHome: (String, String) -> Unit, // (userName, userRole)
-    onGoRegister: () -> Unit, // Navega a la pantalla de Registro
+    onLoginOkNavigateHome: (String, String, Long) -> Unit, // (userName, userRole, pacienteId)
+    onGoRegister: () -> Unit,
 ) {
     val context = LocalContext.current
     val loginScreenVm: LoginScreenVm = viewModel(factory = ViewModelFactory(context))
@@ -44,7 +44,7 @@ fun LoginScreen(
         loginScreenVm.loginResults.collect {
             when (it) {
                 is LoginResult.Success -> {
-                    onLoginOkNavigateHome(it.userName, it.userRole)
+                    onLoginOkNavigateHome(it.userName, it.userRole, it.pacienteId)
                 }
             }
         }

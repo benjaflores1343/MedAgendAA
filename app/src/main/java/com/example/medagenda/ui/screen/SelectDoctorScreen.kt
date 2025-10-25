@@ -19,21 +19,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medagenda.data.local.dto.MedicoInfo
 import com.example.medagenda.di.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RequestAppointmentScreen(
+fun SelectDoctorScreen(
     pacienteId: Long,
-    onSpecialtySelected: (Long, Long) -> Unit
+    onDoctorSelected: (Long, Long) -> Unit
 ) {
     val context = LocalContext.current
-    val vm: RequestAppointmentVm = viewModel(factory = ViewModelFactory(context))
-    val especialidades by vm.especialidadesState.collectAsState()
+    val vm: SelectDoctorVm = viewModel(factory = ViewModelFactory(context))
+    val medicos by vm.medicosState.collectAsState()
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Solicitar Cita") })
+            TopAppBar(title = { Text("Seleccionar Médico") })
         }
     ) { paddingValues ->
         LazyColumn(
@@ -44,15 +45,15 @@ fun RequestAppointmentScreen(
         ) {
             item {
                 Text(
-                    text = "Seleccione una especialidad",
+                    text = "Médicos disponibles",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
-            items(especialidades) { especialidad ->
-                SpecialtyCard(
-                    specialtyName = especialidad.nombreEspecialidad, 
-                    onClick = { onSpecialtySelected(especialidad.idEspecialidad, pacienteId) }
+            items(medicos) { medico ->
+                DoctorCard(
+                    medico = medico, 
+                    onClick = { onDoctorSelected(medico.idMedico, pacienteId) }
                 )
             }
         }
@@ -61,7 +62,7 @@ fun RequestAppointmentScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SpecialtyCard(specialtyName: String, onClick: () -> Unit) {
+private fun DoctorCard(medico: MedicoInfo, onClick: () -> Unit) {
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -69,7 +70,16 @@ private fun SpecialtyCard(specialtyName: String, onClick: () -> Unit) {
             .padding(vertical = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = specialtyName, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = "${medico.nombre} ${medico.apellido}",
+                style = MaterialTheme.typography.titleMedium
+            )
+            if (medico.biografia != null) {
+                Text(
+                    text = medico.biografia,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }

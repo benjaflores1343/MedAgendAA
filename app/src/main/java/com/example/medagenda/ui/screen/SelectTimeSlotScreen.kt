@@ -1,5 +1,6 @@
 package com.example.medagenda.ui.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,28 +13,44 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medagenda.data.local.entity.Horario
 import com.example.medagenda.di.ViewModelFactory
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun RequestAppointmentScreen(
+fun SelectTimeSlotScreen(
+    medicoId: Long, 
     pacienteId: Long,
-    onSpecialtySelected: (Long, Long) -> Unit
+    onBookingConfirmed: () -> Unit
 ) {
     val context = LocalContext.current
-    val vm: RequestAppointmentVm = viewModel(factory = ViewModelFactory(context))
-    val especialidades by vm.especialidadesState.collectAsState()
+    val vm: SelectTimeSlotVm = viewModel(factory = ViewModelFactory(context))
+    val horarios by vm.horariosState.collectAsState()
+
+    LaunchedEffect(key1 = Unit) {
+        vm.bookingResult.collect {
+            when (it) {
+                is BookingResult.Success -> {
+                    Toast.makeText(context, "¡Cita reservada con éxito!", Toast.LENGTH_LONG).show()
+                    onBookingConfirmed()
+                }
+                is BookingResult.Error -> {
+                    Toast.makeText(context, it.message, Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Solicitar Cita") })
+            TopAppBar(title = { Text("Seleccionar Horario") })
         }
     ) { paddingValues ->
         LazyColumn(
@@ -44,15 +61,15 @@ fun RequestAppointmentScreen(
         ) {
             item {
                 Text(
-                    text = "Seleccione una especialidad",
+                    text = "Horarios disponibles",
                     style = MaterialTheme.typography.headlineSmall,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
             }
-            items(especialidades) { especialidad ->
-                SpecialtyCard(
-                    specialtyName = especialidad.nombreEspecialidad, 
-                    onClick = { onSpecialtySelected(especialidad.idEspecialidad, pacienteId) }
+            items(horarios) { horario ->
+                TimeSlotCard(
+                    horario = horario,
+                    onClick = { vm.bookAppointment(pacienteId, horario) }
                 )
             }
         }
@@ -61,7 +78,10 @@ fun RequestAppointmentScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SpecialtyCard(specialtyName: String, onClick: () -> Unit) {
+private fun TimeSlotCard(horario: Horario, onClick: () -> Unit) {
+    val formatter = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm", Locale("es", "ES"))
+    val startTime = formatter.format(horario.fechaHoraInicio)
+
     Card(
         onClick = onClick,
         modifier = Modifier
@@ -69,7 +89,10 @@ private fun SpecialtyCard(specialtyName: String, onClick: () -> Unit) {
             .padding(vertical = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = specialtyName, style = MaterialTheme.typography.titleMedium)
+            Text(
+                text = startTime,
+                style = MaterialTheme.typography.titleMedium
+            )
         }
     }
 }

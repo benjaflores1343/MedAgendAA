@@ -1,21 +1,9 @@
 package com.example.medagenda.ui.screen
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
@@ -30,8 +18,9 @@ import com.example.medagenda.di.ViewModelFactory
 fun HomeScreen(
     userName: String,
     userRole: String,
+    pacienteId: Long,
     onLogout: () -> Unit,
-    onGoToRequestAppointment: () -> Unit,
+    onGoToRequestAppointment: (Long) -> Unit,
 ) {
     val context = LocalContext.current
     val homeScreenVm: HomeScreenVm = viewModel(factory = ViewModelFactory(context))
@@ -39,9 +28,7 @@ fun HomeScreen(
     LaunchedEffect(key1 = Unit) {
         homeScreenVm.logoutResults.collect {
             when (it) {
-                is LogoutResult.Success -> {
-                    onLogout()
-                }
+                is LogoutResult.Success -> onLogout()
             }
         }
     }
@@ -77,10 +64,9 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Aquí mostramos contenido diferente según el rol
             when (userRole) {
                 "Paciente" -> {
-                    Button(onClick = onGoToRequestAppointment) {
+                    Button(onClick = { onGoToRequestAppointment(pacienteId) }) {
                         Text("Solicitar una Cita")
                     }
                 }

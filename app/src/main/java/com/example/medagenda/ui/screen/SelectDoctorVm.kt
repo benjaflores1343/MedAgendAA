@@ -8,6 +8,7 @@ import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 
 class SelectDoctorVm(
@@ -21,7 +22,7 @@ class SelectDoctorVm(
         if (id != -1L) {
             usuarioRepository.getMedicosByEspecialidad(id)
         } else {
-            kotlinx.coroutines.flow.flowOf(emptyList())
+            flowOf(emptyList())
         }
     }.stateIn(
         scope = viewModelScope,

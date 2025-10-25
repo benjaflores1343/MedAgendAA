@@ -15,4 +15,7 @@ interface EspecialidadDao {
 
     @Query("SELECT * FROM especialidades ORDER BY nombre_especialidad ASC")
     fun getAllEspecialidades(): Flow<List<Especialidad>>
+
+    @Query("SELECT * FROM especialidades WHERE nombre_especialidad = :name LIMIT 1")
+    suspend fun findEspecialidadByName(name: String): Especialidad?
 }

@@ -18,11 +18,11 @@ data class LoginUiState(
     val password: String = "",
     val emailError: String? = null,
     val passwordError: String? = null,
-    val authError: String? = null // For general login errors
+    val authError: String? = null
 )
 
 sealed interface LoginResult {
-    data class Success(val userName: String, val userRole: String) : LoginResult
+    data class Success(val userName: String, val userRole: String, val pacienteId: Long) : LoginResult
 }
 
 sealed class LoginUiEvent {
@@ -85,13 +85,20 @@ class LoginScreenVm(
             }
 
             val rol = usuarioRepository.getRolForUser(user.idUsuario)
-            
-            resultChannel.send(
-                LoginResult.Success(
-                    userName = user.nombre,
-                    userRole = rol?.nombreRol ?: "Desconocido"
+            val paciente = usuarioRepository.findPacienteByUserId(user.idUsuario)
+
+            if (rol != null && paciente != null) {
+                resultChannel.send(
+                    LoginResult.Success(
+                        userName = user.nombre,
+                        userRole = rol.nombreRol,
+                        pacienteId = paciente.idPaciente
+                    )
                 )
-            )
+            } else {
+                // Handle case where user is not a patient or role is not found
+                uiState = uiState.copy(authError = "Este usuario no tiene un perfil de paciente.")
+            }
         }
     }
 }
