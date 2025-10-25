@@ -2,10 +2,13 @@ package com.example.medagenda.ui.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medagenda.di.ViewModelFactory
 
@@ -27,6 +31,7 @@ fun HomeScreen(
     userName: String,
     userRole: String,
     onLogout: () -> Unit,
+    onGoToRequestAppointment: () -> Unit,
 ) {
     val context = LocalContext.current
     val homeScreenVm: HomeScreenVm = viewModel(factory = ViewModelFactory(context))
@@ -56,7 +61,8 @@ fun HomeScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues),
+                .padding(paddingValues)
+                .padding(16.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -69,18 +75,19 @@ fun HomeScreen(
                 style = MaterialTheme.typography.titleMedium
             )
 
-            // Aquí puedes empezar a mostrar contenido diferente según el rol
+            Spacer(modifier = Modifier.height(32.dp))
+
+            // Aquí mostramos contenido diferente según el rol
             when (userRole) {
                 "Paciente" -> {
-                    // Composable para la vista de Paciente
-                    Text("Aquí verás tus próximas citas.")
+                    Button(onClick = onGoToRequestAppointment) {
+                        Text("Solicitar una Cita")
+                    }
                 }
                 "Médico" -> {
-                    // Composable para la vista de Médico
                     Text("Aquí verás tu agenda de hoy.")
                 }
                 "Administrador" -> {
-                    // Composable para la vista de Administrador
                     Text("Aquí tendrás acceso a la gestión de usuarios y reportes.")
                 }
             }

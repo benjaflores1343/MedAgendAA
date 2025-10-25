@@ -4,6 +4,7 @@ package com.example.medagenda.navigation
 sealed class Route(val definition: String) { // Cada objeto representa una pantalla
     data object Login    : Route("login")    // Ruta Login
     data object Register : Route("register") // Ruta Registro
+    data object RequestAppointment : Route("request_appointment") // Ruta para solicitar cita
 
     // Home es especial porque necesita argumentos.
     // `definition` contiene el patrón para el NavGraph.

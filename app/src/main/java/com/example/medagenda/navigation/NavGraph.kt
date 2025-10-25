@@ -13,6 +13,7 @@ import androidx.navigation.navArgument
 import com.example.medagenda.ui.screen.HomeScreen
 import com.example.medagenda.ui.screen.LoginScreen
 import com.example.medagenda.ui.screen.RegisterScreen
+import com.example.medagenda.ui.screen.RequestAppointmentScreen
 
 @Composable
 fun NavGraph(navController: NavHostController) {
@@ -69,13 +70,18 @@ fun NavGraph(navController: NavHostController) {
                 userRole = userRole,
                 onLogout = {
                     navController.navigate(Route.Login.definition) {
-                        // Pop up to the start destination of the graph to clear the back stack
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
-                }
+                },
+                onGoToRequestAppointment = { navController.navigate(Route.RequestAppointment.definition) }
             )
+        }
+        composable(
+            route = Route.RequestAppointment.definition,
+            enterTransition = { fadeIn(animationSpec = tween(700)) },
+            exitTransition = { fadeOut(animationSpec = tween(700)) }
+        ) {
+            RequestAppointmentScreen()
         }
     }
 }

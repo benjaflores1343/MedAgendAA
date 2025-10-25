@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.medagenda.data.local.entity.Especialidad
 import com.example.medagenda.data.local.entity.Rol
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -23,9 +24,9 @@ object MedAgendaDatabaseProvider {
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onCreate(db: SupportSQLiteDatabase) {
                     super.onCreate(db)
-                    // Populate the database with initial data
                     INSTANCE?.let { database ->
                         CoroutineScope(Dispatchers.IO).launch {
+                            // Insert initial roles
                             val rolDao = database.rolDao()
                             rolDao.insertRoles(
                                 listOf(
@@ -33,6 +34,18 @@ object MedAgendaDatabaseProvider {
                                     Rol(nombreRol = "Médico", descripcion = "Gestión de sus propias citas y pacientes"),
                                     Rol(nombreRol = "Recepcionista", descripcion = "Gestión de citas y pacientes"),
                                     Rol(nombreRol = "Paciente", descripcion = "Acceso a sus propias citas")
+                                )
+                            )
+
+                            // Insert initial specialties
+                            val especialidadDao = database.especialidadDao()
+                            especialidadDao.insertEspecialidades(
+                                listOf(
+                                    Especialidad(nombreEspecialidad = "Medicina General"),
+                                    Especialidad(nombreEspecialidad = "Cardiología"),
+                                    Especialidad(nombreEspecialidad = "Dermatología"),
+                                    Especialidad(nombreEspecialidad = "Pediatría"),
+                                    Especialidad(nombreEspecialidad = "Ginecología")
                                 )
                             )
                         }
