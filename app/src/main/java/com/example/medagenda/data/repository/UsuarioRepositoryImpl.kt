@@ -1,9 +1,11 @@
 package com.example.medagenda.data.repository
 
 import com.example.medagenda.data.local.dao.EspecialidadDao
+import com.example.medagenda.data.local.dao.MedicoDao
 import com.example.medagenda.data.local.dao.PacienteDao
 import com.example.medagenda.data.local.dao.RolDao
 import com.example.medagenda.data.local.dao.UsuarioDao
+import com.example.medagenda.data.local.dto.MedicoInfo
 import com.example.medagenda.data.local.entity.Especialidad
 import com.example.medagenda.data.local.entity.Paciente
 import com.example.medagenda.data.local.entity.Rol
@@ -16,7 +18,8 @@ class UsuarioRepositoryImpl(
     private val usuarioDao: UsuarioDao,
     private val rolDao: RolDao,
     private val pacienteDao: PacienteDao,
-    private val especialidadDao: EspecialidadDao
+    private val especialidadDao: EspecialidadDao,
+    private val medicoDao: MedicoDao
 ) : UsuarioRepository {
 
     override suspend fun registerUser(usuario: Usuario, fechaNacimiento: String, direccion: String) {
@@ -54,5 +57,9 @@ class UsuarioRepositoryImpl(
 
     override fun getAllEspecialidades(): Flow<List<Especialidad>> {
         return especialidadDao.getAllEspecialidades()
+    }
+
+    override fun getMedicosByEspecialidad(idEspecialidad: Long): Flow<List<MedicoInfo>> {
+        return medicoDao.getMedicosByEspecialidad(idEspecialidad)
     }
 }
