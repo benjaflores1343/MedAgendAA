@@ -11,4 +11,8 @@ class UsuarioRepositoryImpl(
     override suspend fun registerUser(usuario: Usuario) {
         usuarioDao.insertUsuario(usuario)
     }
+
+    override suspend fun findByEmail(email: String): Usuario? {
+        return usuarioDao.findByEmail(email)
+    }
 }

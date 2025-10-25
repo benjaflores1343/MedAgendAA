@@ -8,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.medagenda.data.local.entity.Usuario
 import com.example.medagenda.domain.repository.UsuarioRepository
+import com.example.medagenda.domain.security.PasswordHasher
 import com.example.medagenda.domain.validation.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -128,13 +129,14 @@ class RegisterScreenVm(
         }
         
         viewModelScope.launch {
+            val hashedPassword = PasswordHasher.hashPassword(state.password)
             val newUser = Usuario(
                 rut = state.rut,
                 nombre = state.nombre,
                 apellido = state.apellido,
                 email = state.email,
                 telefono = state.telefono,
-                contrasenaHash = state.password // TODO: Hash the password
+                contrasenaHash = hashedPassword
             )
             usuarioRepository.registerUser(newUser)
             validationEventChannel.send(ValidationEvent.Success)

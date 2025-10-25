@@ -21,6 +21,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
@@ -28,13 +29,15 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medagenda.di.ViewModelFactory
 
 @Composable
 fun LoginScreen(
     onLoginOkNavigateHome: () -> Unit, // Navega a Home si el login es OK
     onGoRegister: () -> Unit, // Navega a la pantalla de Registro
-    loginScreenVm: LoginScreenVm = viewModel()
 ) {
+    val context = LocalContext.current
+    val loginScreenVm: LoginScreenVm = viewModel(factory = ViewModelFactory(context))
     val uiState = loginScreenVm.uiState
 
     LaunchedEffect(key1 = Unit) {
@@ -60,7 +63,7 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
-            isError = uiState.emailError != null,
+            isError = uiState.emailError != null || uiState.authError != null,
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Email
             )
@@ -78,10 +81,15 @@ fun LoginScreen(
             label = { Text("Contraseña") },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password") },
             visualTransformation = PasswordVisualTransformation(),
-            isError = uiState.passwordError != null
+            isError = uiState.passwordError != null || uiState.authError != null
         )
         if (uiState.passwordError != null) {
             Text(text = uiState.passwordError, color = MaterialTheme.colorScheme.error)
+        }
+
+        if (uiState.authError != null) {
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(text = uiState.authError, color = MaterialTheme.colorScheme.error)
         }
 
         Spacer(modifier = Modifier.height(16.dp))

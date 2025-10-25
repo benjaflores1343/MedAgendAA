@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.medagenda.data.local.database.MedAgendaDatabaseProvider
 import com.example.medagenda.data.repository.UsuarioRepositoryImpl
 import com.example.medagenda.domain.repository.UsuarioRepository
+import com.example.medagenda.ui.screen.LoginScreenVm
 import com.example.medagenda.ui.screen.RegisterScreenVm
 
 class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory {
@@ -14,11 +15,16 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
     private val usuarioRepository: UsuarioRepository by lazy { UsuarioRepositoryImpl(db.usuarioDao()) }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(RegisterScreenVm::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return RegisterScreenVm(usuarioRepository) as T
+        return when {
+            modelClass.isAssignableFrom(RegisterScreenVm::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                RegisterScreenVm(usuarioRepository) as T
+            }
+            modelClass.isAssignableFrom(LoginScreenVm::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                LoginScreenVm(usuarioRepository) as T
+            }
+            else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
-        // Aquí se pueden añadir otros ViewModels en el futuro
-        throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
     }
 }

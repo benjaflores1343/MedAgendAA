@@ -4,11 +4,11 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.medagenda.ui.screen.HomeScreen
 import com.example.medagenda.ui.screen.LoginScreen
 import com.example.medagenda.ui.screen.RegisterScreen
 
@@ -63,8 +63,7 @@ fun NavGraph(navController: NavHostController) {
             enterTransition = { fadeIn(animationSpec = tween(700)) },
             exitTransition = { fadeOut(animationSpec = tween(700)) }
         ) {
-            // Placeholder for the home screen
-            Text(text = "¡Has iniciado sesión!")
+            HomeScreen()
         }
     }
 }
