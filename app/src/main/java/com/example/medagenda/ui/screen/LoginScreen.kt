@@ -33,7 +33,7 @@ import com.example.medagenda.di.ViewModelFactory
 
 @Composable
 fun LoginScreen(
-    onLoginOkNavigateHome: () -> Unit, // Navega a Home si el login es OK
+    onLoginOkNavigateHome: (String, String) -> Unit, // (userName, userRole)
     onGoRegister: () -> Unit, // Navega a la pantalla de Registro
 ) {
     val context = LocalContext.current
@@ -41,10 +41,10 @@ fun LoginScreen(
     val uiState = loginScreenVm.uiState
 
     LaunchedEffect(key1 = Unit) {
-        loginScreenVm.validationEvents.collect {
+        loginScreenVm.loginResults.collect {
             when (it) {
-                is ValidationEvent.Success -> {
-                    onLoginOkNavigateHome()
+                is LoginResult.Success -> {
+                    onLoginOkNavigateHome(it.userName, it.userRole)
                 }
             }
         }

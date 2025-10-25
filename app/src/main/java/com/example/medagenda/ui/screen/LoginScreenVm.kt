@@ -21,6 +21,10 @@ data class LoginUiState(
     val authError: String? = null // For general login errors
 )
 
+sealed interface LoginResult {
+    data class Success(val userName: String, val userRole: String) : LoginResult
+}
+
 sealed class LoginUiEvent {
     data class EmailChanged(val email: String) : LoginUiEvent()
     data class PasswordChanged(val password: String) : LoginUiEvent()
@@ -36,8 +40,8 @@ class LoginScreenVm(
     var uiState by mutableStateOf(LoginUiState())
         private set
 
-    private val validationEventChannel = Channel<ValidationEvent>()
-    val validationEvents = validationEventChannel.receiveAsFlow()
+    private val resultChannel = Channel<LoginResult>()
+    val loginResults = resultChannel.receiveAsFlow()
 
     fun onEvent(event: LoginUiEvent) {
         when (event) {
@@ -80,7 +84,14 @@ class LoginScreenVm(
                 return@launch
             }
 
-            validationEventChannel.send(ValidationEvent.Success)
+            val rol = usuarioRepository.getRolForUser(user.idUsuario)
+            
+            resultChannel.send(
+                LoginResult.Success(
+                    userName = user.nombre,
+                    userRole = rol?.nombreRol ?: "Desconocido"
+                )
+            )
         }
     }
 }

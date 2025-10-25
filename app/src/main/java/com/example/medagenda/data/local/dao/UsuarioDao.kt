@@ -10,7 +10,7 @@ import com.example.medagenda.data.local.entity.Usuario
 interface UsuarioDao {
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertUsuario(usuario: Usuario)
+    suspend fun insertUsuario(usuario: Usuario): Long // Returns the new user's ID
 
     @Query("SELECT * FROM usuarios WHERE email = :email LIMIT 1")
     suspend fun findByEmail(email: String): Usuario?

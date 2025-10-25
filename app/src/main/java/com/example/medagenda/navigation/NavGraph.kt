@@ -6,42 +6,36 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.medagenda.ui.screen.HomeScreen
 import com.example.medagenda.ui.screen.LoginScreen
 import com.example.medagenda.ui.screen.RegisterScreen
-
-// Objeto para centralizar las rutas y evitar errores de tipeo
-object Routes {
-    const val LoginScreen = "login"
-    const val HomeScreen = "home"
-    const val RegisterScreen = "register"
-}
 
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        // startDestination define la pantalla con la que arranca la app
-        startDestination = Routes.LoginScreen
+        startDestination = Route.Login.definition
     ) {
         composable(
-            Routes.LoginScreen,
+            route = Route.Login.definition,
             enterTransition = { fadeIn(animationSpec = tween(700)) },
             exitTransition = { fadeOut(animationSpec = tween(700)) }
         ) {
             LoginScreen(
-                onLoginOkNavigateHome = { 
-                    navController.navigate(Routes.HomeScreen) {
-                        popUpTo(Routes.LoginScreen) { inclusive = true }
+                onLoginOkNavigateHome = { userName, userRole ->
+                    navController.navigate(Route.Home.build(userName, userRole)) {
+                        popUpTo(Route.Login.definition) { inclusive = true }
                     }
-                 },
-                onGoRegister = { navController.navigate(Routes.RegisterScreen) }
+                },
+                onGoRegister = { navController.navigate(Route.Register.definition) }
             )
         }
         composable(
-            Routes.RegisterScreen,
+            route = Route.Register.definition,
             enterTransition = { 
                 slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Left, animationSpec = tween(700))
             },
@@ -51,19 +45,37 @@ fun NavGraph(navController: NavHostController) {
         ) {
             RegisterScreen(
                 onRegisterOkNavigateToLogin = { 
-                    navController.navigate(Routes.LoginScreen) {
-                        popUpTo(Routes.LoginScreen) { inclusive = true }
+                    navController.navigate(Route.Login.definition) {
+                        popUpTo(Route.Login.definition) { inclusive = true }
                     }
                  },
                 onGoLogin = { navController.popBackStack() }
             )
         }
         composable(
-            Routes.HomeScreen,
+            route = Route.Home.definition,
+            arguments = listOf(
+                navArgument("userName") { type = NavType.StringType },
+                navArgument("userRole") { type = NavType.StringType }
+            ),
             enterTransition = { fadeIn(animationSpec = tween(700)) },
             exitTransition = { fadeOut(animationSpec = tween(700)) }
-        ) {
-            HomeScreen()
+        ) { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("userName") ?: ""
+            val userRole = backStackEntry.arguments?.getString("userRole") ?: ""
+
+            HomeScreen(
+                userName = userName, 
+                userRole = userRole,
+                onLogout = {
+                    navController.navigate(Route.Login.definition) {
+                        // Pop up to the start destination of the graph to clear the back stack
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
     }
 }
