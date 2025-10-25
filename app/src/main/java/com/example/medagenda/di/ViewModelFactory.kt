@@ -14,7 +14,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
 
     private val db by lazy { MedAgendaDatabaseProvider.getDatabase(context) }
     private val usuarioRepository: UsuarioRepository by lazy {
-        UsuarioRepositoryImpl(db.usuarioDao(), db.rolDao())
+        UsuarioRepositoryImpl(db.usuarioDao(), db.rolDao(), db.pacienteDao())
     }
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

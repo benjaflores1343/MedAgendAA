@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 data class RegistrationFormState(
+    // User info
     val nombre: String = "",
     val nombreError: String? = null,
     val apellido: String = "",
@@ -23,12 +24,19 @@ data class RegistrationFormState(
     val rutError: String? = null,
     val telefono: String = "",
     val telefonoError: String? = null,
+    // Patient info
+    val fechaNacimiento: String = "",
+    val fechaNacimientoError: String? = null,
+    val direccion: String = "",
+    val direccionError: String? = null,
+    // Auth info
     val email: String = "",
     val emailError: String? = null,
     val password: String = "",
     val passwordError: String? = null,
     val repeatedPassword: String = "",
     val repeatedPasswordError: String? = null,
+    // Other
     val acceptedTerms: Boolean = false,
     val termsError: String? = null,
     val profileImageUri: Uri? = null
@@ -44,6 +52,8 @@ class RegisterScreenVm(
     private val validateApellido: ValidateApellido = ValidateApellido(),
     private val validateRut: ValidateRut = ValidateRut(),
     private val validateTelefono: ValidateTelefono = ValidateTelefono(),
+    private val validateFechaNacimiento: ValidateFechaNacimiento = ValidateFechaNacimiento(),
+    private val validateDireccion: ValidateDireccion = ValidateDireccion(),
     private val validateEmail: ValidateEmail = ValidateEmail(),
     private val validatePassword: ValidatePassword = ValidatePassword(),
     private val validateRepeatedPassword: ValidateRepeatedPassword = ValidateRepeatedPassword(),
@@ -58,28 +68,34 @@ class RegisterScreenVm(
     fun onEvent(event: RegistrationFormEvent) {
         when (event) {
             is RegistrationFormEvent.NombreChanged -> {
-                state = state.copy(nombre = event.nombre)
+                state = state.copy(nombre = event.nombre, nombreError = null)
             }
             is RegistrationFormEvent.ApellidoChanged -> {
-                state = state.copy(apellido = event.apellido)
+                state = state.copy(apellido = event.apellido, apellidoError = null)
             }
             is RegistrationFormEvent.RutChanged -> {
-                state = state.copy(rut = event.rut)
+                state = state.copy(rut = event.rut, rutError = null)
             }
             is RegistrationFormEvent.TelefonoChanged -> {
-                state = state.copy(telefono = event.telefono)
+                state = state.copy(telefono = event.telefono, telefonoError = null)
+            }
+            is RegistrationFormEvent.FechaNacimientoChanged -> {
+                state = state.copy(fechaNacimiento = event.fechaNacimiento, fechaNacimientoError = null)
+            }
+            is RegistrationFormEvent.DireccionChanged -> {
+                state = state.copy(direccion = event.direccion, direccionError = null)
             }
             is RegistrationFormEvent.EmailChanged -> {
-                state = state.copy(email = event.email)
+                state = state.copy(email = event.email, emailError = null)
             }
             is RegistrationFormEvent.PasswordChanged -> {
-                state = state.copy(password = event.password)
+                state = state.copy(password = event.password, passwordError = null)
             }
             is RegistrationFormEvent.RepeatedPasswordChanged -> {
-                state = state.copy(repeatedPassword = event.repeatedPassword)
+                state = state.copy(repeatedPassword = event.repeatedPassword, repeatedPasswordError = null)
             }
             is RegistrationFormEvent.AcceptTerms -> {
-                state = state.copy(acceptedTerms = event.isAccepted)
+                state = state.copy(acceptedTerms = event.isAccepted, termsError = null)
             }
             is RegistrationFormEvent.ProfileImageChanged -> {
                 state = state.copy(profileImageUri = event.uri)
@@ -95,23 +111,17 @@ class RegisterScreenVm(
         val apellidoResult = validateApellido.execute(state.apellido)
         val rutResult = validateRut.execute(state.rut)
         val telefonoResult = validateTelefono.execute(state.telefono)
+        val fechaNacimientoResult = validateFechaNacimiento.execute(state.fechaNacimiento)
+        val direccionResult = validateDireccion.execute(state.direccion)
         val emailResult = validateEmail.execute(state.email)
         val passwordResult = validatePassword.execute(state.password)
-        val repeatedPasswordResult = validateRepeatedPassword.execute(
-            state.password,
-            state.repeatedPassword
-        )
+        val repeatedPasswordResult = validateRepeatedPassword.execute(state.password, state.repeatedPassword)
         val termsResult = validateTerms.execute(state.acceptedTerms)
 
         val hasError = listOf(
-            nombreResult,
-            apellidoResult,
-            rutResult,
-            telefonoResult,
-            emailResult,
-            passwordResult,
-            repeatedPasswordResult,
-            termsResult
+            nombreResult, apellidoResult, rutResult, telefonoResult, 
+            fechaNacimientoResult, direccionResult, 
+            emailResult, passwordResult, repeatedPasswordResult, termsResult
         ).any { !it.successful }
 
         if (hasError) {
@@ -120,6 +130,8 @@ class RegisterScreenVm(
                 apellidoError = apellidoResult.errorMessage,
                 rutError = rutResult.errorMessage,
                 telefonoError = telefonoResult.errorMessage,
+                fechaNacimientoError = fechaNacimientoResult.errorMessage,
+                direccionError = direccionResult.errorMessage,
                 emailError = emailResult.errorMessage,
                 passwordError = passwordResult.errorMessage,
                 repeatedPasswordError = repeatedPasswordResult.errorMessage,
@@ -138,7 +150,8 @@ class RegisterScreenVm(
                 telefono = state.telefono,
                 contrasenaHash = hashedPassword
             )
-            usuarioRepository.registerUser(newUser)
+            
+            usuarioRepository.registerUser(newUser, state.fechaNacimiento, state.direccion)
             validationEventChannel.send(ValidationEvent.Success)
         }
     }
@@ -149,6 +162,8 @@ sealed class RegistrationFormEvent {
     data class ApellidoChanged(val apellido: String) : RegistrationFormEvent()
     data class RutChanged(val rut: String) : RegistrationFormEvent()
     data class TelefonoChanged(val telefono: String) : RegistrationFormEvent()
+    data class FechaNacimientoChanged(val fechaNacimiento: String) : RegistrationFormEvent()
+    data class DireccionChanged(val direccion: String) : RegistrationFormEvent()
     data class EmailChanged(val email: String) : RegistrationFormEvent()
     data class PasswordChanged(val password: String) : RegistrationFormEvent()
     data class RepeatedPasswordChanged(val repeatedPassword: String) : RegistrationFormEvent()

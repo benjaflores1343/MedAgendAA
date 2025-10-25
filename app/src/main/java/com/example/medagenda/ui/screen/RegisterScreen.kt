@@ -13,11 +13,7 @@ import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Badge
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -88,7 +84,6 @@ fun RegisterScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        // --- Avatar y botón de cámara ---
         Image(
             painter = rememberAsyncImagePainter(state.profileImageUri ?: "https://via.placeholder.com/150"),
             contentDescription = "Avatar",
@@ -98,10 +93,9 @@ fun RegisterScreen(
                 .clickable { permissionLauncher.launch(Manifest.permission.CAMERA) },
             contentScale = ContentScale.Crop
         )
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- Nuevos campos ---
+        // --- User Info ---
         OutlinedTextField(
             value = state.nombre,
             onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.NombreChanged(it)) },
@@ -113,7 +107,6 @@ fun RegisterScreen(
         if (state.nombreError != null) {
             Text(text = state.nombreError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -127,7 +120,6 @@ fun RegisterScreen(
         if (state.apellidoError != null) {
             Text(text = state.apellidoError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -141,7 +133,6 @@ fun RegisterScreen(
         if (state.rutError != null) {
             Text(text = state.rutError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -156,10 +147,36 @@ fun RegisterScreen(
         if (state.telefonoError != null) {
             Text(text = state.telefonoError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
-        // --- Campos existentes ---
+        // --- Patient Info ---
+        OutlinedTextField(
+            value = state.fechaNacimiento,
+            onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.FechaNacimientoChanged(it)) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Fecha de Nacimiento (dd/mm/aaaa)") },
+            leadingIcon = { Icon(Icons.Default.Cake, contentDescription = "Fecha de Nacimiento") },
+            isError = state.fechaNacimientoError != null
+        )
+        if (state.fechaNacimientoError != null) {
+            Text(text = state.fechaNacimientoError, color = MaterialTheme.colorScheme.error)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = state.direccion,
+            onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.DireccionChanged(it)) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Dirección") },
+            leadingIcon = { Icon(Icons.Default.Home, contentDescription = "Dirección") },
+            isError = state.direccionError != null
+        )
+        if (state.direccionError != null) {
+            Text(text = state.direccionError, color = MaterialTheme.colorScheme.error)
+        }
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // --- Auth Info ---
         OutlinedTextField(
             value = state.email,
             onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.EmailChanged(it)) },
@@ -167,14 +184,11 @@ fun RegisterScreen(
             label = { Text("Email") },
             leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
             isError = state.emailError != null,
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Email
-            )
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
         )
         if (state.emailError != null) {
             Text(text = state.emailError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -189,7 +203,6 @@ fun RegisterScreen(
         if (state.passwordError != null) {
             Text(text = state.passwordError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(
@@ -204,7 +217,6 @@ fun RegisterScreen(
         if (state.repeatedPasswordError != null) {
             Text(text = state.repeatedPasswordError, color = MaterialTheme.colorScheme.error)
         }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(verticalAlignment = Alignment.CenterVertically) {
