@@ -3,6 +3,7 @@ package com.example.medagenda.navigation
 sealed class Route(val definition: String) {
     data object Login : Route("login")
     data object Register : Route("register")
+    data object UserList : Route("user_list")
 
     data object Home : Route("home/{userName}/{userRole}/{userId}") {
         fun build(userName: String, userRole: String, userId: Long): String {

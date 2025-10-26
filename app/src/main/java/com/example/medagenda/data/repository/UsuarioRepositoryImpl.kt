@@ -1,9 +1,7 @@
 package com.example.medagenda.data.repository
 
 import com.example.medagenda.data.local.dao.*
-import com.example.medagenda.data.local.dto.AppointmentInfo
-import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
-import com.example.medagenda.data.local.dto.MedicoInfo
+import com.example.medagenda.data.local.dto.*
 import com.example.medagenda.data.local.entity.*
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.Flow
@@ -66,5 +64,13 @@ class UsuarioRepositoryImpl(
 
     override fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>> {
         return citaDao.getAppointmentsForDoctor(medicoId)
+    }
+
+    override suspend fun getAppointmentDetails(citaId: Long): AppointmentFullDetails? {
+        return citaDao.getAppointmentDetails(citaId)
+    }
+
+    override fun getAllUsersWithRoles(): Flow<List<UserInfo>> {
+        return usuarioDao.getAllUsersWithRoles()
     }
 }

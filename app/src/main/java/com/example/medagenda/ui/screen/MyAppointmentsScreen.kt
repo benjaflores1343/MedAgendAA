@@ -1,5 +1,6 @@
 package com.example.medagenda.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -26,9 +27,10 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyAppointmentsScreen() {
+fun MyAppointmentsScreen(
+    onGoToAppointmentDetail: (Long) -> Unit, // New navigation event
+) {
     val context = LocalContext.current
-    // The ViewModel will get the patientId from the SavedStateHandle
     val vm: MyAppointmentsVm = viewModel(factory = ViewModelFactory(context))
     val appointments by vm.appointmentsState.collectAsState()
 
@@ -44,18 +46,26 @@ fun MyAppointmentsScreen() {
                 .padding(16.dp)
         ) {
             items(appointments) { appointment ->
-                AppointmentCard(appointment = appointment)
+                AppointmentCard(
+                    appointment = appointment,
+                    onCardClicked = { onGoToAppointmentDetail(appointment.idCita) }
+                )
             }
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppointmentCard(appointment: AppointmentInfo) {
+private fun AppointmentCard(
+    appointment: AppointmentInfo,
+    onCardClicked: () -> Unit,
+) {
     val formatter = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm", Locale("es", "ES"))
     val startTime = formatter.format(appointment.fechaHoraInicio)
 
     Card(
+        onClick = onCardClicked, // Make the card clickable
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)

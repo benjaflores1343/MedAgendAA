@@ -1,38 +1,27 @@
 package com.example.medagenda.data.local.entity
 
-import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
-import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "usuario_rol",
+    tableName = "usuarios_roles", // Explicit table name
+    primaryKeys = ["idUsuario", "idRol"],
     foreignKeys = [
         ForeignKey(
             entity = Usuario::class,
-            parentColumns = ["id_usuario"],
-            childColumns = ["id_usuario"],
-            onDelete = ForeignKey.CASCADE
+            parentColumns = ["idUsuario"],
+            childColumns = ["idUsuario"],
+            onDelete = ForeignKey.CASCADE // Optional: what to do if a user is deleted
         ),
         ForeignKey(
             entity = Rol::class,
-            parentColumns = ["id_rol"],
-            childColumns = ["id_rol"],
-            onDelete = ForeignKey.CASCADE
+            parentColumns = ["idRol"],
+            childColumns = ["idRol"],
+            onDelete = ForeignKey.CASCADE // Optional: what to do if a role is deleted
         )
     ]
 )
 data class UsuarioRol(
-    @PrimaryKey(autoGenerate = true)
-    @ColumnInfo(name = "id_usuario_rol")
-    val idUsuarioRol: Long = 0,
-
-    @ColumnInfo(name = "id_usuario", index = true)
     val idUsuario: Long,
-
-    @ColumnInfo(name = "id_rol", index = true)
-    val idRol: Long,
-
-    @ColumnInfo(name = "fecha_asignacion")
-    val fechaAsignacion: Long = System.currentTimeMillis()
+    val idRol: Long
 )

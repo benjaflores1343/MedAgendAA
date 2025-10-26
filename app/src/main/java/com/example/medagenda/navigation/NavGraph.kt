@@ -63,6 +63,9 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onGoToAppointmentDetail = { cId ->
                     navController.navigate(Route.AppointmentDetail.build(cId))
+                },
+                onGoToUserList = { 
+                    navController.navigate(Route.UserList.definition)
                 }
             )
         }
@@ -115,13 +118,24 @@ fun NavGraph(navController: NavHostController) {
             route = Route.MyAppointments.definition,
             arguments = listOf(navArgument("patientId") { type = NavType.LongType })
         ) { 
-            MyAppointmentsScreen()
+            MyAppointmentsScreen(
+                onGoToAppointmentDetail = { cId ->
+                    navController.navigate(Route.AppointmentDetail.build(cId))
+                }
+            )
         }
         composable(
             route = Route.AppointmentDetail.definition,
             arguments = listOf(navArgument("citaId") { type = NavType.LongType })
         ) {
-            // TODO: Replace with the actual AppointmentDetailScreen
+            AppointmentDetailScreen(
+                onBack = { navController.popBackStack() }
+            )
+        }
+        composable(Route.UserList.definition) {
+            UserListScreen(
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

@@ -31,7 +31,8 @@ fun HomeScreen(
     onLogout: () -> Unit,
     onGoToRequestAppointment: (Long) -> Unit,
     onGoToMyAppointments: (Long) -> Unit,
-    onGoToAppointmentDetail: (Long) -> Unit, // New navigation event
+    onGoToAppointmentDetail: (Long) -> Unit,
+    onGoToUserList: () -> Unit, // New navigation event
 ) {
     val context = LocalContext.current
     val homeScreenVm: HomeScreenVm = viewModel(factory = ViewModelFactory(context))
@@ -114,7 +115,9 @@ fun HomeScreen(
                         }
                     }
                     "Administrador" -> {
-                        Text("Aquí tendrás acceso a la gestión de usuarios y reportes.")
+                        Button(onClick = onGoToUserList) {
+                            Text("Gestionar Usuarios")
+                        }
                     }
                 }
             }

@@ -50,6 +50,14 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
                 @Suppress("UNCHECKED_CAST")
                 MyAppointmentsVm(usuarioRepository, savedStateHandle) as T
             }
+            modelClass.isAssignableFrom(AppointmentDetailVm::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                AppointmentDetailVm(usuarioRepository, savedStateHandle) as T
+            }
+            modelClass.isAssignableFrom(UserListVm::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                UserListVm(usuarioRepository) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }
     }
