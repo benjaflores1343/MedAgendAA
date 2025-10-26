@@ -112,7 +112,8 @@ fun NavGraph(navController: NavHostController) {
             MyAppointmentsScreen(
                 onGoToAppointmentDetail = { citaId ->
                     navController.navigate(Route.AppointmentDetail.build(citaId))
-                }
+                },
+                onBack = { navController.popBackStack() }
             )
         }
         composable(
