@@ -45,4 +45,6 @@ sealed class Route(val definition: String) {
             return definition.replace("{citaId}", citaId.toString())
         }
     }
+
+    data object Camera : Route("camera")
 }

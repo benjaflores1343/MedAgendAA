@@ -20,8 +20,8 @@ class MyAppointmentsVm(
     val appointmentsState: StateFlow<List<AppointmentInfo>> = patientId.flatMapLatest { id ->
         if (id != -1L) {
             usuarioRepository.getAppointmentsForPatient(id)
-                .onStart { _isLoading.value = true }
-                .onCompletion { _isLoading.value = false }
+                .onStart { _isLoading.value = true } // Show loader when starting
+                .onEach { _isLoading.value = false } // Hide loader on first emission
         } else {
             flowOf(emptyList())
         }

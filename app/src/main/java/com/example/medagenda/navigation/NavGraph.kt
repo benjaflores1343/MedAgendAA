@@ -57,7 +57,8 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onGoToMyAppointments = { pId ->
                     navController.navigate(Route.MyAppointments.build(pId))
-                }
+                },
+                onGoToCamera = { navController.navigate(Route.Camera.definition) }
             )
         }
         composable(
@@ -123,6 +124,10 @@ fun NavGraph(navController: NavHostController) {
             AppointmentDetailScreen(
                 onBack = { navController.popBackStack() }
             )
+        }
+
+        composable(Route.Camera.definition) {
+            CameraScreen()
         }
     }
 }

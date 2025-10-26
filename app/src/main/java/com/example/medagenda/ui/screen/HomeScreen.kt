@@ -23,12 +23,13 @@ fun HomeScreen(
     onLogout: () -> Unit,
     onGoToRequestAppointment: (Long) -> Unit,
     onGoToMyAppointments: (Long) -> Unit,
+    onGoToCamera: () -> Unit,  // New navigation event for the camera
 ) {
     val context = LocalContext.current
     val homeScreenVm: HomeScreenVm = viewModel(factory = ViewModelFactory(context))
     val state by homeScreenVm.state.collectAsState()
 
-    LaunchedEffect(key1 = userId) { // Use userId as the key
+    LaunchedEffect(key1 = userId) { 
         if (userId != -1L) {
             homeScreenVm.onEvent(HomeScreenEvent.LoadPatientId(userId))
         }
@@ -59,7 +60,8 @@ fun HomeScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
                 .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Text(
                 text = "¡Bienvenido, $userName!",
@@ -82,9 +84,14 @@ fun HomeScreen(
                         }
                     }
                 } ?: run {
-                    // Optional: Show a message if patientId is not found
                     Text("No se pudieron cargar los datos del paciente.")
                 }
+            }
+
+            Spacer(modifier = Modifier.weight(1f)) // Pushes the new buttons to the bottom
+
+            Button(onClick = onGoToCamera) {
+                Text("Tomar Foto")
             }
         }
     }
