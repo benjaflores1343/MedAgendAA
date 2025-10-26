@@ -16,8 +16,8 @@ fun NavGraph(navController: NavHostController) {
     ) {
         composable(Route.Login.definition) { 
             LoginScreen(
-                onLoginOkNavigateHome = { userName, userRole, pacienteId ->
-                    navController.navigate(Route.Home.build(userName, userRole, pacienteId)) {
+                onLoginOkNavigateHome = { userName, userRole, userId ->
+                    navController.navigate(Route.Home.build(userName, userRole, userId)) {
                         popUpTo(Route.Login.definition) { inclusive = true }
                     }
                 },
@@ -39,17 +39,17 @@ fun NavGraph(navController: NavHostController) {
             arguments = listOf(
                 navArgument("userName") { type = NavType.StringType },
                 navArgument("userRole") { type = NavType.StringType },
-                navArgument("pacienteId") { type = NavType.LongType }
+                navArgument("userId") { type = NavType.LongType }
             )
         ) { backStackEntry ->
             val userName = backStackEntry.arguments?.getString("userName") ?: ""
             val userRole = backStackEntry.arguments?.getString("userRole") ?: ""
-            val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: -1L
+            val userId = backStackEntry.arguments?.getLong("userId") ?: -1L
 
             HomeScreen(
                 userName = userName, 
                 userRole = userRole,
-                pacienteId = pacienteId,
+                userId = userId,
                 onLogout = {
                     navController.navigate(Route.Login.definition) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
@@ -57,6 +57,9 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onGoToRequestAppointment = { pId ->
                     navController.navigate(Route.RequestAppointment.build(pId))
+                },
+                onGoToMyAppointments = { pId ->
+                    navController.navigate(Route.MyAppointments.build(pId))
                 }
             )
         }
@@ -104,6 +107,12 @@ fun NavGraph(navController: NavHostController) {
                     navController.popBackStack(homeRoutePattern, false)
                 }
             )
+        }
+        composable(
+            route = Route.MyAppointments.definition,
+            arguments = listOf(navArgument("patientId") { type = NavType.LongType })
+        ) { 
+            MyAppointmentsScreen()
         }
     }
 }

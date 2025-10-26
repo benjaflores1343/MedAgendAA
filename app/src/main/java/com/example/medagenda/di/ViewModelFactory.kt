@@ -32,7 +32,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             }
             modelClass.isAssignableFrom(HomeScreenVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
-                HomeScreenVm() as T
+                HomeScreenVm(usuarioRepository, savedStateHandle) as T
             }
             modelClass.isAssignableFrom(RequestAppointmentVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
@@ -45,6 +45,10 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             modelClass.isAssignableFrom(SelectTimeSlotVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 SelectTimeSlotVm(usuarioRepository, savedStateHandle) as T
+            }
+            modelClass.isAssignableFrom(MyAppointmentsVm::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                MyAppointmentsVm(usuarioRepository, savedStateHandle) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

@@ -4,12 +4,12 @@ sealed class Route(val definition: String) {
     data object Login : Route("login")
     data object Register : Route("register")
 
-    data object Home : Route("home/{userName}/{userRole}/{pacienteId}") {
-        fun build(userName: String, userRole: String, pacienteId: Long): String {
+    data object Home : Route("home/{userName}/{userRole}/{userId}") {
+        fun build(userName: String, userRole: String, userId: Long): String {
             return definition
                 .replace("{userName}", userName)
                 .replace("{userRole}", userRole)
-                .replace("{pacienteId}", pacienteId.toString())
+                .replace("{userId}", userId.toString())
         }
     }
 
@@ -32,6 +32,12 @@ sealed class Route(val definition: String) {
             return definition
                 .replace("{medicoId}", medicoId.toString())
                 .replace("{pacienteId}", pacienteId.toString())
+        }
+    }
+
+    data object MyAppointments : Route("my_appointments/{patientId}") {
+        fun build(patientId: Long): String {
+            return definition.replace("{patientId}", patientId.toString())
         }
     }
 }

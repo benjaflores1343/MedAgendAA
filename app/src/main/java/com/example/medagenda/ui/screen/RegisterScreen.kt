@@ -1,7 +1,9 @@
 package com.example.medagenda.ui.screen
 
 import android.Manifest
+import android.app.DatePickerDialog
 import android.net.Uri
+import android.widget.DatePicker
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
@@ -15,8 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,17 +35,33 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.medagenda.BuildConfig
 import com.example.medagenda.di.ViewModelFactory
 import java.io.File
+import java.util.Calendar
+import java.util.Date
 
 @Composable
 fun RegisterScreen(
-    onRegisterOkNavigateToLogin: () -> Unit, // Navega a Login si el registro es OK
-    onGoLogin: () -> Unit, // Navega a la pantalla de Login
+    onRegisterOkNavigateToLogin: () -> Unit,
+    onGoLogin: () -> Unit,
 ) {
     val context = LocalContext.current
     val registerScreenVm: RegisterScreenVm = viewModel(factory = ViewModelFactory(context))
     val state = registerScreenVm.state
 
-    // --- Lógica para la cámara ---
+    // --- Date Picker --- 
+    val calendar = Calendar.getInstance()
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _: DatePicker, selectedYear: Int, selectedMonth: Int, selectedDay: Int ->
+            registerScreenVm.onEvent(RegistrationFormEvent.FechaNacimientoChanged("$selectedDay/${selectedMonth + 1}/$selectedYear"))
+        },
+        year, month, day
+    )
+
+    // --- Camera Logic ---
     val file = File(context.cacheDir, "picture.jpg")
     val uri = FileProvider.getUriForFile(context, BuildConfig.APPLICATION_ID + ".provider", file)
 
@@ -152,11 +169,12 @@ fun RegisterScreen(
         // --- Patient Info ---
         OutlinedTextField(
             value = state.fechaNacimiento,
-            onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.FechaNacimientoChanged(it)) },
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Fecha de Nacimiento (dd/mm/aaaa)") },
+            onValueChange = {},
+            modifier = Modifier.fillMaxWidth().clickable { datePickerDialog.show() },
+            label = { Text("Fecha de Nacimiento") },
             leadingIcon = { Icon(Icons.Default.Cake, contentDescription = "Fecha de Nacimiento") },
-            isError = state.fechaNacimientoError != null
+            isError = state.fechaNacimientoError != null,
+            readOnly = true
         )
         if (state.fechaNacimientoError != null) {
             Text(text = state.fechaNacimientoError, color = MaterialTheme.colorScheme.error)
