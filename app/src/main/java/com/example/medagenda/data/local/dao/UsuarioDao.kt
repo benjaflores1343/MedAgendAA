@@ -25,7 +25,7 @@ interface UsuarioDao {
             u.email, 
             r.nombre_rol AS nombreRol
         FROM usuarios AS u
-        INNER JOIN UsuarioRol AS ur ON u.id_usuario = ur.id_usuario
+        INNER JOIN usuarios_roles AS ur ON u.id_usuario = ur.id_usuario
         INNER JOIN roles AS r ON ur.id_rol = r.id_rol
         ORDER BY u.apellido ASC
     """)

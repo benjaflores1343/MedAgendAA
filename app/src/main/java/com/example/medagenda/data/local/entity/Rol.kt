@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
 data class Rol(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_rol")
-    val idRol: Long = 0,
+    val idRol: Long = 0, // This default value is NECESSARY for autoGenerate to work
 
     @ColumnInfo(name = "nombre_rol")
     val nombreRol: String,

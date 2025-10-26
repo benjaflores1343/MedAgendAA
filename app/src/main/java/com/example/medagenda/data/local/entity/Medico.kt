@@ -25,7 +25,7 @@ import androidx.room.PrimaryKey
 data class Medico(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_medico")
-    val idMedico: Long = 0,
+    val idMedico: Long = 0, // Restored the default value
 
     @ColumnInfo(name = "id_usuario", index = true)
     val idUsuario: Long,

@@ -10,7 +10,7 @@ import com.example.medagenda.data.local.entity.*
         Usuario::class, Rol::class, UsuarioRol::class, Paciente::class, 
         Especialidad::class, Medico::class, Horario::class, Cita::class
     ],
-    version = 9, // Incremented version for the schema change
+    version = 19, // Incremented version to apply all schema changes
     exportSchema = false
 )
 abstract class MedAgendaDatabase : RoomDatabase() {

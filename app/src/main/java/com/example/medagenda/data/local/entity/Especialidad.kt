@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
 data class Especialidad(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_especialidad")
-    val idEspecialidad: Long = 0,
+    val idEspecialidad: Long = 0, // This default value is NECESSARY
 
     @ColumnInfo(name = "nombre_especialidad")
     val nombreEspecialidad: String

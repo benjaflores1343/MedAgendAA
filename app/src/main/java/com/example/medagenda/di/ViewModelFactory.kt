@@ -32,7 +32,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             }
             modelClass.isAssignableFrom(HomeScreenVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
-                HomeScreenVm(usuarioRepository, savedStateHandle) as T
+                HomeScreenVm(usuarioRepository) as T // Removed savedStateHandle
             }
             modelClass.isAssignableFrom(RequestAppointmentVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")

@@ -19,7 +19,7 @@ import androidx.room.PrimaryKey
 data class Horario(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id_horario")
-    val idHorario: Long = 0,
+    val idHorario: Long = 0, // Restored the default value
 
     @ColumnInfo(name = "id_medico", index = true)
     val idMedico: Long,

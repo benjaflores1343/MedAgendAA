@@ -20,7 +20,7 @@ interface RolDao {
 
     @Query("""
         SELECT r.* FROM roles r
-        INNER JOIN usuario_rol ur ON r.id_rol = ur.id_rol
+        INNER JOIN usuarios_roles ur ON r.id_rol = ur.id_rol
         WHERE ur.id_usuario = :idUsuario
         LIMIT 1
     """)

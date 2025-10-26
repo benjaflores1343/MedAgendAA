@@ -22,7 +22,7 @@ data class LoginUiState(
 )
 
 sealed interface LoginResult {
-    data class Success(val userName: String, val userRole: String, val userId: Long) : LoginResult
+    data class Success(val userName: String, val userId: Long) : LoginResult
 }
 
 sealed class LoginUiEvent {
@@ -84,19 +84,7 @@ class LoginScreenVm(
                 return@launch
             }
 
-            val rol = usuarioRepository.getRolForUser(user.idUsuario)
-            if (rol == null) {
-                uiState = uiState.copy(authError = "No se pudo determinar el rol del usuario.")
-                return@launch
-            }
-
-            resultChannel.send(
-                LoginResult.Success(
-                    userName = user.nombre,
-                    userRole = rol.nombreRol,
-                    userId = user.idUsuario
-                )
-            )
+            resultChannel.send(LoginResult.Success(userName = user.nombre, userId = user.idUsuario))
         }
     }
 }
