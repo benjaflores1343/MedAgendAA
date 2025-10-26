@@ -6,6 +6,7 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.medagenda.data.local.dto.AppointmentInfo
+import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
 import com.example.medagenda.data.local.entity.Cita
 import kotlinx.coroutines.flow.Flow
 
@@ -41,4 +42,20 @@ interface CitaDao {
         ORDER BY h.fecha_hora_inicio DESC
     """)
     fun getAppointmentsForPatient(patientId: Long): Flow<List<AppointmentInfo>>
+
+    @Query("""
+        SELECT
+            c.id_cita AS idCita,
+            h.fecha_hora_inicio AS fechaHoraInicio,
+            p_user.nombre AS nombrePaciente,
+            p_user.apellido AS apellidoPaciente,
+            c.estado AS estadoCita
+        FROM citas AS c
+        INNER JOIN horarios AS h ON c.id_horario = h.id_horario
+        INNER JOIN pacientes AS p ON c.id_paciente = p.id_paciente
+        INNER JOIN usuarios AS p_user ON p.id_usuario = p_user.id_usuario
+        WHERE c.id_medico = :medicoId
+        ORDER BY h.fecha_hora_inicio ASC
+    """)
+    fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>>
 }

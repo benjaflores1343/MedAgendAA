@@ -3,17 +3,17 @@ package com.example.medagenda.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.receiveAsFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class HomeScreenState(
     val pacienteId: Long? = null,
-    val medicoId: Long? = null
+    val medicoId: Long? = null,
+    val doctorAppointments: List<DoctorAppointmentInfo> = emptyList(),
+    val isLoading: Boolean = false
 )
 
 sealed interface HomeScreenEvent {
@@ -43,14 +43,27 @@ class HomeScreenVm(
             when (userRole) {
                 "Paciente" -> {
                     viewModelScope.launch {
+                        _state.update { it.copy(isLoading = true) }
                         val paciente = usuarioRepository.findPacienteByUserId(userId)
-                        _state.update { it.copy(pacienteId = paciente?.idPaciente) }
+                        _state.update { it.copy(pacienteId = paciente?.idPaciente, isLoading = false) }
                     }
                 }
                 "Médico" -> {
                     viewModelScope.launch {
+                        _state.update { it.copy(isLoading = true) }
                         val medico = usuarioRepository.findMedicoByUserId(userId)
-                        _state.update { it.copy(medicoId = medico?.idMedico) }
+                        if (medico != null) {
+                            _state.update { it.copy(medicoId = medico.idMedico) }
+                            usuarioRepository.getAppointmentsForDoctor(medico.idMedico)
+                                .onEach { appointments ->
+                                    _state.update { 
+                                        it.copy(doctorAppointments = appointments, isLoading = false) 
+                                    }
+                                }
+                                .launchIn(viewModelScope)
+                        } else {
+                            _state.update { it.copy(isLoading = false) }
+                        }
                     }
                 }
             }

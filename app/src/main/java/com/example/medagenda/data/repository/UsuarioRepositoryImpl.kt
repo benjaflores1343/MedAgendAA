@@ -2,6 +2,7 @@ package com.example.medagenda.data.repository
 
 import com.example.medagenda.data.local.dao.*
 import com.example.medagenda.data.local.dto.AppointmentInfo
+import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
 import com.example.medagenda.data.local.dto.MedicoInfo
 import com.example.medagenda.data.local.entity.*
 import com.example.medagenda.domain.repository.UsuarioRepository
@@ -61,5 +62,9 @@ class UsuarioRepositoryImpl(
 
     override suspend fun findMedicoByUserId(idUsuario: Long): Medico? {
         return medicoDao.findMedicoByUserId(idUsuario)
+    }
+
+    override fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>> {
+        return citaDao.getAppointmentsForDoctor(medicoId)
     }
 }

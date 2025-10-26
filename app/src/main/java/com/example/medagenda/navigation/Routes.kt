@@ -40,4 +40,10 @@ sealed class Route(val definition: String) {
             return definition.replace("{patientId}", patientId.toString())
         }
     }
+
+    data object AppointmentDetail : Route("appointment_detail/{citaId}") {
+        fun build(citaId: Long): String {
+            return definition.replace("{citaId}", citaId.toString())
+        }
+    }
 }

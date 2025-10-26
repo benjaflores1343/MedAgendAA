@@ -1,6 +1,7 @@
 package com.example.medagenda.domain.repository
 
 import com.example.medagenda.data.local.dto.AppointmentInfo
+import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
 import com.example.medagenda.data.local.dto.MedicoInfo
 import com.example.medagenda.data.local.entity.*
 import kotlinx.coroutines.flow.Flow
@@ -16,4 +17,5 @@ interface UsuarioRepository {
     suspend fun findPacienteByUserId(idUsuario: Long): Paciente?
     fun getAppointmentsForPatient(patientId: Long): Flow<List<AppointmentInfo>>
     suspend fun findMedicoByUserId(idUsuario: Long): Medico?
+    fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>>
 }
