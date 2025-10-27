@@ -15,4 +15,7 @@ interface RecetaDao {
 
     @Query("SELECT * FROM recetas WHERE id_paciente = :idPaciente ORDER BY fecha_creacion DESC")
     fun getRecetasForPaciente(idPaciente: Long): Flow<List<Receta>>
+
+    @Query("DELETE FROM recetas WHERE id_receta IN (:recetaIds)")
+    suspend fun deleteRecetasByIds(recetaIds: List<Long>)
 }

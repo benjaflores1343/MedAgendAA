@@ -82,4 +82,8 @@ class UsuarioRepositoryImpl(
     override fun getRecetasForPaciente(idPaciente: Long): Flow<List<Receta>> {
         return recetaDao.getRecetasForPaciente(idPaciente)
     }
+
+    override suspend fun deleteRecetas(recetaIds: List<Long>) {
+        recetaDao.deleteRecetasByIds(recetaIds)
+    }
 }
