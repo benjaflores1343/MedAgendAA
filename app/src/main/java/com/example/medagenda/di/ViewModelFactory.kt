@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.medagenda.data.local.database.MedAgendaDatabaseProvider
+import com.example.medagenda.data.repository.MedicoRepository
 import com.example.medagenda.data.repository.UsuarioRepositoryImpl
 import com.example.medagenda.domain.repository.UsuarioRepository
 import com.example.medagenda.ui.screen.*
@@ -16,6 +17,9 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
     private val db by lazy { MedAgendaDatabaseProvider.getDatabase(context) }
     private val usuarioRepository: UsuarioRepository by lazy {
         UsuarioRepositoryImpl(db.usuarioDao(), db.rolDao(), db.pacienteDao(), db.especialidadDao(), db.medicoDao(), db.horarioDao(), db.citaDao())
+    }
+    private val medicoRepository: MedicoRepository by lazy {
+        MedicoRepository(db.medicoDao())
     }
 
     override fun <T : ViewModel> create(modelClass: Class<T>, extras: CreationExtras): T {
@@ -38,13 +42,13 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
                 @Suppress("UNCHECKED_CAST")
                 RequestAppointmentVm(usuarioRepository) as T
             }
-            modelClass.isAssignableFrom(SelectDoctorVm::class.java) -> {
+            modelClass.isAssignableFrom(SelectDoctorViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
-                SelectDoctorVm(usuarioRepository, savedStateHandle) as T
+                SelectDoctorViewModel(medicoRepository) as T
             }
-            modelClass.isAssignableFrom(SelectTimeSlotVm::class.java) -> {
+            modelClass.isAssignableFrom(SelectTimeSlotViewModel::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
-                SelectTimeSlotVm(usuarioRepository, savedStateHandle) as T
+                SelectTimeSlotViewModel(usuarioRepository) as T
             }
             modelClass.isAssignableFrom(MyAppointmentsVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")

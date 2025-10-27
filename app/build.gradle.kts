@@ -66,7 +66,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose)
-    implementation(libs.accompanist.permissions)
     
     // Room Database
     implementation(libs.androidx.room.runtime)

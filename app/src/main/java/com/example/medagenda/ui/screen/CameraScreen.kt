@@ -1,8 +1,15 @@
 package com.example.medagenda.ui.screen
 
 import android.Manifest
+import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
+import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -15,13 +22,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -29,30 +38,37 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
-import java.io.File
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.util.concurrent.Executor
-import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun CameraScreen() {
-    val cameraPermissionState = rememberPermissionState(
-        permission = Manifest.permission.CAMERA
+    val context = LocalContext.current
+    var hasPermission by remember { mutableStateOf(false) }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            hasPermission = isGranted
+        }
     )
 
-    if (cameraPermissionState.status.isGranted) {
+    LaunchedEffect(Unit) {
+        when (ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)) {
+            PackageManager.PERMISSION_GRANTED -> {
+                hasPermission = true
+            }
+            else -> {
+                permissionLauncher.launch(Manifest.permission.CAMERA)
+            }
+        }
+    }
+
+    if (hasPermission) {
         CameraView()
     } else {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Button(onClick = { cameraPermissionState.launchPermissionRequest() }) {
-                Text("Dar permiso para la cámara")
-            }
+            Text("Se necesita permiso para usar la cámara.")
         }
     }
 }
@@ -113,20 +129,34 @@ private fun CameraView() {
 private fun captureImage(imageCapture: ImageCapture, context: Context) {
     val name = SimpleDateFormat("yyyy-MM-dd-HH-mm-ss-SSS", Locale.US)
         .format(System.currentTimeMillis())
-    val file = File(context.filesDir, "$name.jpg")
 
-    val outputOptions = ImageCapture.OutputFileOptions.Builder(file).build()
+    val contentValues = ContentValues().apply {
+        put(MediaStore.MediaColumns.DISPLAY_NAME, name)
+        put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+        if(Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            put(MediaStore.Images.Media.RELATIVE_PATH, "Pictures/MedAgenda")
+        }
+    }
+
+    val outputOptions = ImageCapture.OutputFileOptions
+        .Builder(context.contentResolver,
+            MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+            contentValues)
+        .build()
 
     imageCapture.takePicture(
         outputOptions,
         ContextCompat.getMainExecutor(context),
         object : ImageCapture.OnImageSavedCallback {
             override fun onImageSaved(outputFileResults: ImageCapture.OutputFileResults) {
-                Log.d("CameraScreen", "Foto guardada: ${outputFileResults.savedUri}")
+                val msg = "Foto guardada en la galería"
+                Toast.makeText(context, msg, Toast.LENGTH_SHORT).show()
+                Log.d("CameraScreen", msg)
             }
 
             override fun onError(exception: ImageCaptureException) {
                 Log.e("CameraScreen", "Error al guardar la foto", exception)
+                Toast.makeText(context, "Error al guardar la foto", Toast.LENGTH_SHORT).show()
             }
         }
     )

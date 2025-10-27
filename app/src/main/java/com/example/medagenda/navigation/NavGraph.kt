@@ -80,8 +80,10 @@ fun NavGraph(navController: NavHostController) {
                 navArgument("pacienteId") { type = NavType.LongType }
             )
         ) { backStackEntry ->
+            val specialtyId = backStackEntry.arguments?.getLong("specialtyId") ?: -1L
             val pacienteId = backStackEntry.arguments?.getLong("pacienteId") ?: -1L
             SelectDoctorScreen(
+                specialtyId = specialtyId,
                 pacienteId = pacienteId,
                 onDoctorSelected = { medicoId, pId ->
                     navController.navigate(Route.SelectTimeSlot.build(medicoId, pId))
