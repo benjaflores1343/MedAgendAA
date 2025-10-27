@@ -117,9 +117,20 @@ fun RegisterScreen(
 
     Column(
         modifier = Modifier.fillMaxSize().padding(16.dp).verticalScroll(rememberScrollState()),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Text(
+            text = "MedAgenda",
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Crea tu cuenta",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Spacer(modifier = Modifier.height(24.dp))
+
         Image(
             painter = rememberAsyncImagePainter(state.profileImageUri ?: "https://via.placeholder.com/150"),
             contentDescription = "Avatar",
@@ -215,9 +226,9 @@ fun RegisterScreen(
                 Button(
                     onClick = {
                         datePickerState.selectedDateMillis?.let {
-                            val selectedDate = Date(it + TimeZone.getDefault().getOffset(it))
                             val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                            val formattedDate = formatter.format(selectedDate)
+                            formatter.timeZone = TimeZone.getTimeZone("UTC")
+                            val formattedDate = formatter.format(Date(it))
                             registerScreenVm.onEvent(RegistrationFormEvent.FechaNacimientoChanged(formattedDate))
                         }
                         showDatePicker = false

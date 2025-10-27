@@ -1,5 +1,6 @@
 package com.example.medagenda.ui.screen
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -7,8 +8,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
@@ -53,10 +56,23 @@ fun LoginScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.Center,
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState()),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Spacer(modifier = Modifier.height(64.dp))
+        Text(
+            text = "MedAgenda",
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = "Inicia Sesión",
+            style = MaterialTheme.typography.headlineSmall
+        )
+        Spacer(modifier = Modifier.height(48.dp))
+
         OutlinedTextField(
             value = uiState.email,
             onValueChange = { loginScreenVm.onEvent(LoginUiEvent.EmailChanged(it)) },
@@ -68,8 +84,8 @@ fun LoginScreen(
                 keyboardType = KeyboardType.Email
             )
         )
-        if (uiState.emailError != null) {
-            Text(text = uiState.emailError, color = MaterialTheme.colorScheme.error)
+        AnimatedVisibility(visible = uiState.emailError != null) {
+            uiState.emailError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -83,13 +99,15 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             isError = uiState.passwordError != null || uiState.authError != null
         )
-        if (uiState.passwordError != null) {
-            Text(text = uiState.passwordError, color = MaterialTheme.colorScheme.error)
+        AnimatedVisibility(visible = uiState.passwordError != null) {
+            uiState.passwordError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 
-        if (uiState.authError != null) {
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(text = uiState.authError, color = MaterialTheme.colorScheme.error)
+        AnimatedVisibility(visible = uiState.authError != null) {
+            uiState.authError?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
