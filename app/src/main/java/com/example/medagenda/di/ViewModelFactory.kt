@@ -16,7 +16,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
 
     private val db by lazy { MedAgendaDatabaseProvider.getDatabase(context) }
     private val usuarioRepository: UsuarioRepository by lazy {
-        UsuarioRepositoryImpl(db.usuarioDao(), db.rolDao(), db.pacienteDao(), db.especialidadDao(), db.medicoDao(), db.horarioDao(), db.citaDao())
+        UsuarioRepositoryImpl(db.usuarioDao(), db.rolDao(), db.pacienteDao(), db.especialidadDao(), db.medicoDao(), db.horarioDao(), db.citaDao(), db.recetaDao()) // Added recetaDao
     }
     private val medicoRepository: MedicoRepository by lazy {
         MedicoRepository(db.medicoDao())
@@ -61,6 +61,14 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             modelClass.isAssignableFrom(UserListVm::class.java) -> {
                 @Suppress("UNCHECKED_CAST")
                 UserListVm(usuarioRepository) as T
+            }
+            modelClass.isAssignableFrom(CameraViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                CameraViewModel(usuarioRepository) as T
+            }
+            modelClass.isAssignableFrom(RecetasViewModel::class.java) -> {
+                @Suppress("UNCHECKED_CAST")
+                RecetasViewModel(usuarioRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: ${modelClass.name}")
         }

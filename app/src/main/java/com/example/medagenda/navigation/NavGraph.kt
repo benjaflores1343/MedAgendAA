@@ -58,7 +58,8 @@ fun NavGraph(navController: NavHostController) {
                 onGoToMyAppointments = { pId ->
                     navController.navigate(Route.MyAppointments.build(pId))
                 },
-                onGoToCamera = { navController.navigate(Route.Camera.definition) }
+                onGoToCamera = { pId -> navController.navigate(Route.Camera.build(pId)) },
+                onGoToMyRecipes = { pId -> navController.navigate(Route.MyRecipes.build(pId)) } // Added navigation to gallery
             )
         }
         composable(
@@ -128,8 +129,26 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable(Route.Camera.definition) {
-            CameraScreen()
+        composable(
+            route = Route.Camera.definition,
+            arguments = listOf(navArgument("patientId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getLong("patientId") ?: -1L
+            CameraScreen(
+                patientId = patientId,
+                onPhotoSaved = { navController.popBackStack() } // Navigate back after saving
+            )
+        }
+
+        composable(
+            route = Route.MyRecipes.definition,
+            arguments = listOf(navArgument("patientId") { type = NavType.LongType })
+        ) { backStackEntry ->
+            val patientId = backStackEntry.arguments?.getLong("patientId") ?: -1L
+            RecetasScreen(
+                pacienteId = patientId,
+                onBack = { navController.popBackStack() }
+            )
         }
     }
 }

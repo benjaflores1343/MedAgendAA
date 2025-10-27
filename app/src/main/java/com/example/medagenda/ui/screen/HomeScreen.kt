@@ -24,7 +24,8 @@ fun HomeScreen(
     onLogout: () -> Unit,
     onGoToRequestAppointment: (Long) -> Unit,
     onGoToMyAppointments: (Long) -> Unit,
-    onGoToCamera: () -> Unit,
+    onGoToCamera: (Long) -> Unit,
+    onGoToMyRecipes: (Long) -> Unit, // Added for recipe gallery
 ) {
     val context = LocalContext.current
     val homeScreenVm: HomeScreenVm = viewModel(factory = ViewModelFactory(context))
@@ -78,11 +79,12 @@ fun HomeScreen(
             if (state.isLoading) {
                 CircularProgressIndicator()
             } else {
-                state.pacienteId?.let {
+                state.pacienteId?.let { patientId ->
                     DashboardMenu(
-                        onGoToRequestAppointment = { onGoToRequestAppointment(it) },
-                        onGoToMyAppointments = { onGoToMyAppointments(it) },
-                        onGoToCamera = onGoToCamera
+                        onGoToRequestAppointment = { onGoToRequestAppointment(patientId) },
+                        onGoToMyAppointments = { onGoToMyAppointments(patientId) },
+                        onGoToCamera = { onGoToCamera(patientId) },
+                        onGoToMyRecipes = { onGoToMyRecipes(patientId) } // Pass patientId
                     )
                 } ?: run {
                     Text("No se pudieron cargar los datos del paciente.")
@@ -96,7 +98,8 @@ fun HomeScreen(
 private fun DashboardMenu(
     onGoToRequestAppointment: () -> Unit,
     onGoToMyAppointments: () -> Unit,
-    onGoToCamera: () -> Unit
+    onGoToCamera: () -> Unit,
+    onGoToMyRecipes: () -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
         DashboardCard(
@@ -108,6 +111,11 @@ private fun DashboardMenu(
             title = "Mis Citas",
             icon = Icons.Default.DateRange,
             onClick = onGoToMyAppointments
+        )
+        DashboardCard(
+            title = "Mis Recetas",
+            icon = Icons.Default.PhotoLibrary,
+            onClick = onGoToMyRecipes
         )
         DashboardCard(
             title = "Tomar foto receta",

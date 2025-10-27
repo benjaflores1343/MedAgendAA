@@ -46,5 +46,15 @@ sealed class Route(val definition: String) {
         }
     }
 
-    data object Camera : Route("camera")
+    data object Camera : Route("camera/{patientId}") { // Added patientId
+        fun build(patientId: Long): String {
+            return definition.replace("{patientId}", patientId.toString())
+        }
+    }
+
+    data object MyRecipes : Route("my_recipes/{patientId}") { // Added for recipe gallery
+        fun build(patientId: Long): String {
+            return definition.replace("{patientId}", patientId.toString())
+        }
+    }
 }

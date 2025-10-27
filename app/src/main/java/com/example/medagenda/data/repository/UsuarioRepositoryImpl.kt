@@ -13,7 +13,8 @@ class UsuarioRepositoryImpl(
     private val especialidadDao: EspecialidadDao,
     private val medicoDao: MedicoDao,
     private val horarioDao: HorarioDao,
-    private val citaDao: CitaDao
+    private val citaDao: CitaDao,
+    private val recetaDao: RecetaDao // Added RecetaDao
 ) : UsuarioRepository {
 
     override suspend fun registerUser(usuario: Usuario, fechaNacimiento: String, direccion: String) {
@@ -72,5 +73,13 @@ class UsuarioRepositoryImpl(
 
     override fun getAllUsersWithRoles(): Flow<List<UserInfo>> {
         return usuarioDao.getAllUsersWithRoles()
+    }
+
+    override suspend fun saveReceta(receta: Receta) {
+        recetaDao.insertReceta(receta)
+    }
+
+    override fun getRecetasForPaciente(idPaciente: Long): Flow<List<Receta>> {
+        return recetaDao.getRecetasForPaciente(idPaciente)
     }
 }

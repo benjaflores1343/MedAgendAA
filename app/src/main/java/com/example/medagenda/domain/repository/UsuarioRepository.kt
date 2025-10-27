@@ -18,4 +18,6 @@ interface UsuarioRepository {
     fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>>
     suspend fun getAppointmentDetails(citaId: Long): AppointmentFullDetails?
     fun getAllUsersWithRoles(): Flow<List<UserInfo>>
+    suspend fun saveReceta(receta: Receta)
+    fun getRecetasForPaciente(idPaciente: Long): Flow<List<Receta>> // Added for gallery
 }
