@@ -7,6 +7,10 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -141,25 +145,41 @@ fun RegisterScreen(
 
         // --- All TextFields and other UI elements... ---
         OutlinedTextField(value = state.nombre, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.NombreChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Nombre") }, leadingIcon = { Icon(Icons.Default.Person, "Nombre") }, isError = state.nombreError != null)
-        AnimatedVisibility(visible = state.nombreError != null) {
+        AnimatedVisibility(
+            visible = state.nombreError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.nombreError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.apellido, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.ApellidoChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Apellido") }, leadingIcon = { Icon(Icons.Default.Person, "Apellido") }, isError = state.apellidoError != null)
-        AnimatedVisibility(visible = state.apellidoError != null) {
+        AnimatedVisibility(
+            visible = state.apellidoError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.apellidoError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.rut, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.RutChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("RUT") }, leadingIcon = { Icon(Icons.Default.Badge, "RUT") }, isError = state.rutError != null)
-        AnimatedVisibility(visible = state.rutError != null) {
+        AnimatedVisibility(
+            visible = state.rutError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.rutError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.telefono, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.TelefonoChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Teléfono") }, leadingIcon = { Icon(Icons.Default.Phone, "Teléfono") }, isError = state.telefonoError != null, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone))
-        AnimatedVisibility(visible = state.telefonoError != null) {
+        AnimatedVisibility(
+            visible = state.telefonoError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.telefonoError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -172,31 +192,51 @@ fun RegisterScreen(
             Spacer(Modifier.width(16.dp))
             Text(text = if (state.fechaNacimiento.isNotBlank()) state.fechaNacimiento else "Fecha de Nacimiento", color = if (state.fechaNacimiento.isNotBlank()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onSurfaceVariant)
         }
-        AnimatedVisibility(visible = state.fechaNacimientoError != null) {
+        AnimatedVisibility(
+            visible = state.fechaNacimientoError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.fechaNacimientoError?.let { Text(text = it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(start = 16.dp, top = 4.dp)) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.direccion, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.DireccionChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Dirección") }, leadingIcon = { Icon(Icons.Default.Home, "Dirección") }, isError = state.direccionError != null)
-        AnimatedVisibility(visible = state.direccionError != null) {
+        AnimatedVisibility(
+            visible = state.direccionError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.direccionError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.email, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.EmailChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Email") }, leadingIcon = { Icon(Icons.Default.Email, "Email") }, isError = state.emailError != null, keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email))
-        AnimatedVisibility(visible = state.emailError != null) {
+        AnimatedVisibility(
+            visible = state.emailError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.emailError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.password, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.PasswordChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Contraseña") }, leadingIcon = { Icon(Icons.Default.Lock, "Password") }, isError = state.passwordError != null, visualTransformation = PasswordVisualTransformation())
-        AnimatedVisibility(visible = state.passwordError != null) {
+        AnimatedVisibility(
+            visible = state.passwordError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.passwordError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
 
         OutlinedTextField(value = state.repeatedPassword, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.RepeatedPasswordChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Repetir contraseña") }, leadingIcon = { Icon(Icons.Default.Lock, "Password") }, isError = state.repeatedPasswordError != null, visualTransformation = PasswordVisualTransformation())
-        AnimatedVisibility(visible = state.repeatedPasswordError != null) {
+        AnimatedVisibility(
+            visible = state.repeatedPasswordError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.repeatedPasswordError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
         Spacer(modifier = Modifier.height(16.dp))
@@ -205,7 +245,11 @@ fun RegisterScreen(
             Checkbox(checked = state.acceptedTerms, onCheckedChange = { registerScreenVm.onEvent(RegistrationFormEvent.AcceptTerms(it)) })
             Text("Acepto los términos y condiciones")
         }
-        AnimatedVisibility(visible = state.termsError != null) {
+        AnimatedVisibility(
+            visible = state.termsError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             state.termsError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 

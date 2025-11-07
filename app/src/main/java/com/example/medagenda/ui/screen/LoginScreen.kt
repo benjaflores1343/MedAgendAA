@@ -1,7 +1,10 @@
 package com.example.medagenda.ui.screen
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -84,7 +87,11 @@ fun LoginScreen(
                 keyboardType = KeyboardType.Email
             )
         )
-        AnimatedVisibility(visible = uiState.emailError != null) {
+        AnimatedVisibility(
+            visible = uiState.emailError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             uiState.emailError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 
@@ -99,11 +106,19 @@ fun LoginScreen(
             visualTransformation = PasswordVisualTransformation(),
             isError = uiState.passwordError != null || uiState.authError != null
         )
-        AnimatedVisibility(visible = uiState.passwordError != null) {
+        AnimatedVisibility(
+            visible = uiState.passwordError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             uiState.passwordError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 
-        AnimatedVisibility(visible = uiState.authError != null) {
+        AnimatedVisibility(
+            visible = uiState.authError != null,
+            enter = slideInVertically { -it } + fadeIn(),
+            exit = slideOutVertically { -it } + fadeOut()
+        ) {
             uiState.authError?.let {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(text = it, color = MaterialTheme.colorScheme.error)
