@@ -5,5 +5,6 @@ data class MedicoInfo(
     val idUsuario: Long,
     val nombre: String,
     val apellido: String,
-    val biografia: String?
+    val biografia: String?,
+    val especialidad: String
 )

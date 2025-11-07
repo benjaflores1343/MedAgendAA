@@ -18,9 +18,10 @@ interface MedicoDao {
     suspend fun findMedicoByUserId(userId: Long): Medico?
 
     @Query("""
-        SELECT m.id_medico AS idMedico, u.id_usuario AS idUsuario, u.nombre, u.apellido, m.biografia
+        SELECT m.id_medico AS idMedico, u.id_usuario AS idUsuario, u.nombre, u.apellido, m.biografia, e.nombre_especialidad AS especialidad
         FROM medicos AS m
         INNER JOIN usuarios AS u ON m.id_usuario = u.id_usuario
+        INNER JOIN especialidades AS e ON m.id_especialidad = e.id_especialidad
         WHERE m.id_especialidad = :idEspecialidad
     """)
     fun getMedicosByEspecialidad(idEspecialidad: Long): Flow<List<MedicoInfo>>

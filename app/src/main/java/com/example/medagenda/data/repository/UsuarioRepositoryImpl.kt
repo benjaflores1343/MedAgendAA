@@ -86,4 +86,8 @@ class UsuarioRepositoryImpl(
     override suspend fun deleteRecetas(recetaIds: List<Long>) {
         recetaDao.deleteRecetasByIds(recetaIds)
     }
+
+    override suspend fun isTimeSlotAvailable(horarioId: Long): Boolean {
+        return !citaDao.isTimeSlotBooked(horarioId)
+    }
 }

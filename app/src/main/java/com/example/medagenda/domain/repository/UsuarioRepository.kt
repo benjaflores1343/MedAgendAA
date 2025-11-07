@@ -21,4 +21,5 @@ interface UsuarioRepository {
     suspend fun saveReceta(receta: Receta)
     fun getRecetasForPaciente(idPaciente: Long): Flow<List<Receta>>
     suspend fun deleteRecetas(recetaIds: List<Long>) // Added for deletion
+    suspend fun isTimeSlotAvailable(horarioId: Long): Boolean
 }

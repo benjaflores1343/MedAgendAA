@@ -73,6 +73,7 @@ private fun DoctorCard(doctor: MedicoInfo, onClick: () -> Unit) {
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "${doctor.nombre} ${doctor.apellido}", style = MaterialTheme.typography.titleMedium)
+            Text(text = doctor.especialidad, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

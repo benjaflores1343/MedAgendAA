@@ -21,6 +21,11 @@ fun NavGraph(navController: NavHostController) {
                         popUpTo(Route.Login.definition) { inclusive = true }
                     }
                 },
+                onDoctorLoginSuccess = { userName, medicoId ->
+                    navController.navigate(Route.DoctorHome.build(userName, medicoId)) {
+                        popUpTo(Route.Login.definition) { inclusive = true }
+                    }
+                },
                 onGoRegister = { navController.navigate(Route.Register.definition) }
             )
         }
@@ -60,6 +65,26 @@ fun NavGraph(navController: NavHostController) {
                 },
                 onGoToCamera = { pId -> navController.navigate(Route.Camera.build(pId)) },
                 onGoToMyRecipes = { pId -> navController.navigate(Route.MyRecipes.build(pId)) } // Added navigation to gallery
+            )
+        }
+        composable(
+            route = Route.DoctorHome.definition,
+            arguments = listOf(
+                navArgument("userName") { type = NavType.StringType },
+                navArgument("medicoId") { type = NavType.LongType }
+            )
+        ) { backStackEntry ->
+            val userName = backStackEntry.arguments?.getString("userName") ?: ""
+            val medicoId = backStackEntry.arguments?.getLong("medicoId") ?: -1L
+
+            DoctorHomeScreen(
+                medicoId = medicoId,
+                userName = userName,
+                onLogout = {
+                    navController.navigate(Route.Login.definition) {
+                        popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                    }
+                }
             )
         }
         composable(

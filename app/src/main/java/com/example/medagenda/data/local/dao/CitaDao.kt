@@ -26,6 +26,9 @@ interface CitaDao {
         markHorarioAsReserved(cita.idHorario)
     }
 
+    @Query("SELECT EXISTS(SELECT 1 FROM citas WHERE id_horario = :horarioId)")
+    suspend fun isTimeSlotBooked(horarioId: Long): Boolean
+
     @Query("""
         SELECT 
             c.id_cita AS idCita, 

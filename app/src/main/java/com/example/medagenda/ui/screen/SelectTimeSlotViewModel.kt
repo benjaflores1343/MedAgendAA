@@ -40,17 +40,28 @@ class SelectTimeSlotViewModel(
 
     fun bookAppointment(pacienteId: Long, timeSlot: Horario, medicoId: Long) {
         viewModelScope.launch {
-            try {
-                val newCita = Cita(
-                    idPaciente = pacienteId,
-                    idMedico = medicoId,
-                    idHorario = timeSlot.idHorario,
-                    estado = "Programada"
+            // First, check if the time slot is still available
+            val isTimeSlotAvailable = repository.isTimeSlotAvailable(timeSlot.idHorario)
+
+            if (isTimeSlotAvailable) {
+                try {
+                    val newCita = Cita(
+                        idPaciente = pacienteId,
+                        idMedico = medicoId,
+                        idHorario = timeSlot.idHorario,
+                        estado = "Programada"
+                    )
+                    repository.createAppointment(newCita)
+                    _state.value = state.value.copy(bookingResult = Result.success(Unit))
+                } catch (e: Exception) {
+                    _state.value = state.value.copy(bookingResult = Result.failure(e))
+                }
+            } else {
+                // Time slot is already booked
+                _state.value = state.value.copy(
+                    bookingResult = Result.failure(Exception("Este horario ya ha sido reservado. Por favor, seleccione otro.")),
+                    error = "Este horario ya ha sido reservado. Por favor, seleccione otro."
                 )
-                repository.createAppointment(newCita)
-                _state.value = state.value.copy(bookingResult = Result.success(Unit))
-            } catch (e: Exception) {
-                _state.value = state.value.copy(bookingResult = Result.failure(e))
             }
         }
     }

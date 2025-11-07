@@ -23,6 +23,7 @@ data class LoginUiState(
 
 sealed interface LoginResult {
     data class Success(val userName: String, val userId: Long) : LoginResult
+    data class DoctorSuccess(val userName: String, val medicoId: Long) : LoginResult // New result for doctors
 }
 
 sealed class LoginUiEvent {
@@ -84,7 +85,24 @@ class LoginScreenVm(
                 return@launch
             }
 
-            resultChannel.send(LoginResult.Success(userName = user.nombre, userId = user.idUsuario))
+            // Check user role and navigate accordingly
+            val rol = usuarioRepository.getRolForUser(user.idUsuario)
+            when (rol?.nombreRol) {
+                "Medico" -> {
+                    val medico = usuarioRepository.findMedicoByUserId(user.idUsuario)
+                    if (medico != null) {
+                        resultChannel.send(LoginResult.DoctorSuccess(userName = user.nombre, medicoId = medico.idMedico))
+                    } else {
+                        uiState = uiState.copy(authError = "Perfil de médico no encontrado.")
+                    }
+                }
+                "Paciente" -> {
+                    resultChannel.send(LoginResult.Success(userName = user.nombre, userId = user.idUsuario))
+                }
+                else -> {
+                    uiState = uiState.copy(authError = "Rol no autorizado para iniciar sesión.")
+                }
+            }
         }
     }
 }
