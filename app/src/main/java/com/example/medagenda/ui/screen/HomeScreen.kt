@@ -12,6 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medagenda.di.ViewModelFactory
@@ -71,10 +72,9 @@ fun HomeScreen(
             )
             Text(
                 text = "¿Qué necesitas hacer hoy?",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(bottom = 32.dp)
             )
-
-            Spacer(modifier = Modifier.height(32.dp))
 
             if (state.isLoading) {
                 CircularProgressIndicator()
@@ -87,7 +87,11 @@ fun HomeScreen(
                         onGoToMyRecipes = { onGoToMyRecipes(patientId) } // Pass patientId
                     )
                 } ?: run {
-                    Text("No se pudieron cargar los datos del paciente.")
+                    if (state.error != null) {
+                        Text(state.error!!)
+                    } else {
+                        Text("No se pudieron cargar los datos del paciente.")
+                    }
                 }
             }
         }
@@ -118,7 +122,7 @@ private fun DashboardMenu(
             onClick = onGoToMyRecipes
         )
         DashboardCard(
-            title = "Tomar foto receta",
+            title = "Tomar Foto de Receta",
             icon = Icons.Default.PhotoCamera,
             onClick = onGoToCamera
         )
@@ -128,18 +132,21 @@ private fun DashboardMenu(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DashboardCard(title: String, icon: ImageVector, onClick: () -> Unit) {
-    Card(
+    OutlinedCard(
         onClick = onClick,
         modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Row(
+        Column(
             modifier = Modifier.padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(40.dp))
-            Spacer(modifier = Modifier.width(16.dp))
-            Text(text = title, style = MaterialTheme.typography.titleLarge)
+            Icon(imageVector = icon, contentDescription = null, modifier = Modifier.size(48.dp), tint = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = title, 
+                style = MaterialTheme.typography.titleMedium,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 interface EspecialidadDao {
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertEspecialidades(especialidades: List<Especialidad>)
+    suspend fun insertEspecialidades(especialidades: List<Especialidad>): List<Long>
 
     @Query("SELECT * FROM especialidades ORDER BY nombre_especialidad ASC")
     fun getAllEspecialidades(): Flow<List<Especialidad>>

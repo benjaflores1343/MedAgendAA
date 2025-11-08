@@ -5,9 +5,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
+import com.example.medagenda.data.local.database.MedAgendaDatabase
 import com.example.medagenda.data.repository.MedicoRepository
 import com.example.medagenda.data.repository.UsuarioRepositoryImpl
-import com.example.medagenda.database.MedAgendaDatabase
 import com.example.medagenda.domain.repository.UsuarioRepository
 import com.example.medagenda.ui.screen.*
 
@@ -48,17 +48,17 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             modelClass.isAssignableFrom(MyAppointmentsVm::class.java) -> {
                 MyAppointmentsVm(usuarioRepository, savedStateHandle) as T
             }
-            modelClass.isAssignableFrom(AppointmentDetailViewModel::class.java) -> {
-                AppointmentDetailViewModel(usuarioRepository, savedStateHandle) as T
-            }
             modelClass.isAssignableFrom(CameraViewModel::class.java) -> {
-                CameraViewModel(usuarioRepository, savedStateHandle) as T
+                CameraViewModel(usuarioRepository) as T
             }
             modelClass.isAssignableFrom(RecetasViewModel::class.java) -> {
-                RecetasViewModel(usuarioRepository, savedStateHandle) as T
+                RecetasViewModel(usuarioRepository) as T
             }
             modelClass.isAssignableFrom(DoctorHomeViewModel::class.java) -> {
                 DoctorHomeViewModel(usuarioRepository, savedStateHandle) as T
+            }
+            modelClass.isAssignableFrom(HomeScreenVm::class.java) -> {
+                HomeScreenVm(usuarioRepository) as T
             }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }

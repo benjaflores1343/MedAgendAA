@@ -23,13 +23,14 @@ data class LoginUiState(
 
 sealed interface LoginResult {
     data class Success(val userName: String, val userId: Long) : LoginResult
-    data class DoctorSuccess(val userName: String, val medicoId: Long) : LoginResult // New result for doctors
+    data class DoctorSuccess(val userName: String, val medicoId: Long) : LoginResult
 }
 
 sealed class LoginUiEvent {
     data class EmailChanged(val email: String) : LoginUiEvent()
     data class PasswordChanged(val password: String) : LoginUiEvent()
-    object Login : LoginUiEvent()
+    object LoginAsPatient : LoginUiEvent()
+    object LoginAsDoctor : LoginUiEvent()
 }
 
 class LoginScreenVm(
@@ -52,13 +53,16 @@ class LoginScreenVm(
             is LoginUiEvent.PasswordChanged -> {
                 uiState = uiState.copy(password = event.password, passwordError = null, authError = null)
             }
-            is LoginUiEvent.Login -> {
-                submitData()
+            is LoginUiEvent.LoginAsPatient -> {
+                submitData(isDoctor = false)
+            }
+            is LoginUiEvent.LoginAsDoctor -> {
+                submitData(isDoctor = true)
             }
         }
     }
 
-    private fun submitData() {
+    private fun submitData(isDoctor: Boolean) {
         val emailResult = validateEmail.execute(uiState.email)
         val passwordResult = validatePassword.execute(uiState.password)
 
@@ -85,22 +89,21 @@ class LoginScreenVm(
                 return@launch
             }
 
-            // Check user role and navigate accordingly
-            val rol = usuarioRepository.getRolForUser(user.idUsuario)
-            when (rol?.nombreRol) {
-                "Medico" -> {
-                    val medico = usuarioRepository.findMedicoByUserId(user.idUsuario)
-                    if (medico != null) {
-                        resultChannel.send(LoginResult.DoctorSuccess(userName = user.nombre, medicoId = medico.idMedico))
-                    } else {
-                        uiState = uiState.copy(authError = "Perfil de médico no encontrado.")
-                    }
+            if (isDoctor) {
+                // Doctor Login
+                val medico = usuarioRepository.findMedicoByUserId(user.idUsuario)
+                if (medico != null) {
+                    resultChannel.send(LoginResult.DoctorSuccess(userName = user.nombre, medicoId = medico.idMedico))
+                } else {
+                    uiState = uiState.copy(authError = "Este usuario no tiene un perfil de médico.")
                 }
-                "Paciente" -> {
+            } else {
+                // Patient Login: The HomeScreen will be responsible for finding the patient ID from the user ID.
+                val paciente = usuarioRepository.findPacienteByUserId(user.idUsuario)
+                if (paciente != null) {
                     resultChannel.send(LoginResult.Success(userName = user.nombre, userId = user.idUsuario))
-                }
-                else -> {
-                    uiState = uiState.copy(authError = "Rol no autorizado para iniciar sesión.")
+                } else {
+                    uiState = uiState.copy(authError = "Este usuario no tiene un perfil de paciente.")
                 }
             }
         }

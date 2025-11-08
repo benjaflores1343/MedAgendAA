@@ -10,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface HorarioDao {
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertHorarios(horarios: List<Horario>)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertHorarios(horarios: List<Horario>): List<Long>
 
     @Query("SELECT * FROM horarios WHERE id_medico = :idMedico AND estado = 'Disponible' ORDER BY fecha_hora_inicio ASC")
     fun getAvailableHorariosForMedico(idMedico: Long): Flow<List<Horario>>

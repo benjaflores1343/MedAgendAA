@@ -130,7 +130,7 @@ fun RegisterScreen(
         )
         Spacer(modifier = Modifier.height(8.dp))
         Text(
-            text = "Crea tu cuenta",
+            text = "Crea tu cuenta en MedAgenda",
             style = MaterialTheme.typography.headlineSmall
         )
         Spacer(modifier = Modifier.height(24.dp))

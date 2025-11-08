@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
@@ -52,7 +53,12 @@ fun DoctorHomeScreen(
             }
             state.error != null -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text(text = state.error!!)
+                    Text(text = state.error!!, textAlign = TextAlign.Center, modifier = Modifier.padding(16.dp))
+                }
+            }
+            state.appointments.isEmpty() -> {
+                Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                    Text("No tienes citas programadas.", style = MaterialTheme.typography.bodyLarge)
                 }
             }
             else -> {
@@ -74,15 +80,15 @@ fun DoctorHomeScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DoctorAppointmentCard(appointment: DoctorAppointmentInfo) {
-    Card(
+    OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = "Paciente: ${appointment.nombrePaciente} ${appointment.apellidoPaciente}", style = MaterialTheme.typography.titleMedium)
-            Text(text = "Fecha: ${appointment.fechaHoraInicio}", style = MaterialTheme.typography.bodyMedium)
-            Text(text = "Estado: ${appointment.estadoCita}", style = MaterialTheme.typography.bodyMedium)
+            Text(text = "${appointment.nombrePaciente} ${appointment.apellidoPaciente}", style = MaterialTheme.typography.titleLarge)
+            Text(text = "Fecha: ${appointment.fechaHoraInicio}", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 8.dp))
+            Text(text = "Estado: ${appointment.estadoCita}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp))
         }
     }
 }

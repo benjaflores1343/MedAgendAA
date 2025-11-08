@@ -62,9 +62,9 @@ object MedAgendaDatabaseProvider {
 
         // --- Specialties ---
         val especialidades = listOf(
-            Especialidad(nombreEspecialidad = "Medicina General"),
-            Especialidad(nombreEspecialidad = "Cardiología"),
-            Especialidad(nombreEspecialidad = "Dermatología")
+            Especialidad(nombreEspecialidad = "Medicina General", descripcion = "Atención primaria y cuidado general."),
+            Especialidad(nombreEspecialidad = "Cardiología", descripcion = "Especialidad médica que se ocupa de las enfermedades del corazón."),
+            Especialidad(nombreEspecialidad = "Dermatología", descripcion = "Tratamiento de enfermedades de la piel.")
         )
         especialidadDao.insertEspecialidades(especialidades)
         val medicinaGeneral = especialidadDao.findEspecialidadByName("Medicina General")

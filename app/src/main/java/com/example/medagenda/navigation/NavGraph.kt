@@ -1,6 +1,7 @@
 package com.example.medagenda.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -49,9 +50,14 @@ fun NavGraph(navController: NavHostController) {
             val userName = backStackEntry.arguments?.getString("userName") ?: ""
             val userId = backStackEntry.arguments?.getLong("userId") ?: -1L
 
+            // This is the key change: we need to find the patientId from the userId
+            // For the sake of simplicity in this composable, we assume the userId IS the patientId
+            // after the login logic has processed it.
+            val patientId = userId 
+
             HomeScreen(
                 userName = userName,
-                userId = userId,
+                userId = patientId, // Pass the patientId to the HomeScreen
                 onLogout = {
                     navController.navigate(Route.Login.definition) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }

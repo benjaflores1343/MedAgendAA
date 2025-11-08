@@ -15,5 +15,7 @@ data class Especialidad(
     val idEspecialidad: Long = 0, // This default value is NECESSARY
 
     @ColumnInfo(name = "nombre_especialidad")
-    val nombreEspecialidad: String
+    val nombreEspecialidad: String,
+
+    val descripcion: String
 )

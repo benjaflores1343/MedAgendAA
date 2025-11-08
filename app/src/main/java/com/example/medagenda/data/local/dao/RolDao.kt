@@ -10,7 +10,7 @@ import com.example.medagenda.data.local.entity.UsuarioRol
 @Dao
 interface RolDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertRoles(roles: List<Rol>)
+    suspend fun insertRoles(roles: List<Rol>): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
     suspend fun assignRolToUser(usuarioRol: UsuarioRol)
