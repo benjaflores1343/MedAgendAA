@@ -23,7 +23,8 @@ import com.example.medagenda.di.ViewModelFactory
 fun DoctorHomeScreen(
     medicoId: Long,
     userName: String,
-    onLogout: () -> Unit
+    onLogout: () -> Unit,
+    onAppointmentClick: (Long) -> Unit // Added for navigation to detail screen
 ) {
     val context = LocalContext.current
     val vm: DoctorHomeViewModel = viewModel(factory = ViewModelFactory(context))
@@ -68,7 +69,8 @@ fun DoctorHomeScreen(
                         DoctorAppointmentCard(
                             appointment = appointment,
                             onApprove = { vm.onEvent(DoctorHomeEvent.ApproveAppointment(appointment.idCita)) },
-                            onReject = { vm.onEvent(DoctorHomeEvent.RejectAppointment(appointment.idCita)) }
+                            onReject = { vm.onEvent(DoctorHomeEvent.RejectAppointment(appointment.idCita)) },
+                            onClick = { onAppointmentClick(appointment.idCita) } // Pass click event
                         )
                     }
                 }
@@ -82,9 +84,11 @@ fun DoctorHomeScreen(
 private fun DoctorAppointmentCard(
     appointment: DoctorAppointmentInfo,
     onApprove: () -> Unit,
-    onReject: () -> Unit
+    onReject: () -> Unit,
+    onClick: () -> Unit
 ) {
     OutlinedCard(
+        onClick = onClick, // Make the card clickable
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)

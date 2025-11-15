@@ -60,6 +60,9 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             modelClass.isAssignableFrom(HomeScreenVm::class.java) -> {
                 HomeScreenVm(usuarioRepository) as T
             }
+            modelClass.isAssignableFrom(DoctorAppointmentDetailViewModel::class.java) -> {
+                DoctorAppointmentDetailViewModel(usuarioRepository, savedStateHandle) as T
+            }
             else -> throw IllegalArgumentException("Unknown ViewModel class: " + modelClass.name)
         }
     }

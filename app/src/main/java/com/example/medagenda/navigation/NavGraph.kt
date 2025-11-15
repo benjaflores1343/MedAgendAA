@@ -91,8 +91,17 @@ fun NavGraph(navController: NavHostController) {
                     navController.navigate(Route.Login.definition) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
                     }
+                },
+                onAppointmentClick = { citaId ->
+                    navController.navigate(Route.DoctorAppointmentDetail.build(citaId))
                 }
             )
+        }
+        composable(
+            route = Route.DoctorAppointmentDetail.definition,
+            arguments = listOf(navArgument("citaId") { type = NavType.LongType })
+        ) {
+            DoctorAppointmentDetailScreen(onBack = { navController.popBackStack() })
         }
         composable(
             route = Route.RequestAppointment.definition,

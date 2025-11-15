@@ -21,6 +21,12 @@ sealed class Route(val definition: String) {
         }
     }
 
+    data object DoctorAppointmentDetail : Route("doctor_appointment_detail/{citaId}") {
+        fun build(citaId: Long): String {
+            return definition.replace("{citaId}", citaId.toString())
+        }
+    }
+
     data object RequestAppointment : Route("request_appointment/{pacienteId}") {
         fun build(pacienteId: Long): String {
             return definition.replace("{pacienteId}", pacienteId.toString())
