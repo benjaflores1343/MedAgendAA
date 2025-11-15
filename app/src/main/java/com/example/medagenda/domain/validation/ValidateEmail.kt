@@ -1,17 +1,8 @@
 package com.example.medagenda.domain.validation
 
+import android.util.Patterns
+
 class ValidateEmail {
-
-    private val EMAIL_REGEX = Regex(
-        "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}" +
-        "\\@" +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}" +
-        "(" +
-        "\\." +
-        "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25}" +
-        ")+"
-    )
-
     fun execute(email: String): ValidationResult {
         if (email.isBlank()) {
             return ValidationResult(
@@ -19,7 +10,7 @@ class ValidateEmail {
                 errorMessage = "El email no puede estar vacío"
             )
         }
-        if (!EMAIL_REGEX.matches(email)) {
+        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
             return ValidationResult(
                 successful = false,
                 errorMessage = "El formato del email no es válido"

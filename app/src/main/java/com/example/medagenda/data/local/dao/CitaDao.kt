@@ -29,6 +29,9 @@ interface CitaDao {
     @Query("SELECT EXISTS(SELECT 1 FROM citas WHERE id_horario = :horarioId)")
     suspend fun isTimeSlotBooked(horarioId: Long): Boolean
 
+    @Query("UPDATE citas SET estado = :newStatus WHERE id_cita = :citaId")
+    suspend fun updateAppointmentStatus(citaId: Long, newStatus: String)
+
     @Query("""
         SELECT 
             c.id_cita AS idCita, 

@@ -90,4 +90,8 @@ class UsuarioRepositoryImpl(
     override suspend fun isTimeSlotAvailable(horarioId: Long): Boolean {
         return !citaDao.isTimeSlotBooked(horarioId)
     }
+
+    override suspend fun updateAppointmentStatus(citaId: Long, newStatus: String) {
+        citaDao.updateAppointmentStatus(citaId, newStatus)
+    }
 }

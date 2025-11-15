@@ -1,10 +1,6 @@
 package com.example.medagenda.ui.screen
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -69,7 +65,11 @@ fun DoctorHomeScreen(
                         .padding(16.dp)
                 ) {
                     items(state.appointments) { appointment ->
-                        DoctorAppointmentCard(appointment = appointment)
+                        DoctorAppointmentCard(
+                            appointment = appointment,
+                            onApprove = { vm.onEvent(DoctorHomeEvent.ApproveAppointment(appointment.idCita)) },
+                            onReject = { vm.onEvent(DoctorHomeEvent.RejectAppointment(appointment.idCita)) }
+                        )
                     }
                 }
             }
@@ -79,7 +79,11 @@ fun DoctorHomeScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DoctorAppointmentCard(appointment: DoctorAppointmentInfo) {
+private fun DoctorAppointmentCard(
+    appointment: DoctorAppointmentInfo,
+    onApprove: () -> Unit,
+    onReject: () -> Unit
+) {
     OutlinedCard(
         modifier = Modifier
             .fillMaxWidth()
@@ -89,6 +93,21 @@ private fun DoctorAppointmentCard(appointment: DoctorAppointmentInfo) {
             Text(text = "${appointment.nombrePaciente} ${appointment.apellidoPaciente}", style = MaterialTheme.typography.titleLarge)
             Text(text = "Fecha: ${appointment.fechaHoraInicio}", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.padding(top = 8.dp))
             Text(text = "Estado: ${appointment.estadoCita}", style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.primary, modifier = Modifier.padding(top = 4.dp))
+
+            if (appointment.estadoCita == "Programada") {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    Button(onClick = onApprove) {
+                        Text("Aprobar")
+                    }
+                    Spacer(modifier = Modifier.width(8.dp))
+                    OutlinedButton(onClick = onReject) {
+                        Text("Rechazar")
+                    }
+                }
+            }
         }
     }
 }
