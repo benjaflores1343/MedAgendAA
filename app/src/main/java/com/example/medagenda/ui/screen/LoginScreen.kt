@@ -20,9 +20,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -30,6 +36,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -44,6 +51,7 @@ fun LoginScreen(
     val context = LocalContext.current
     val loginScreenVm: LoginScreenVm = viewModel(factory = ViewModelFactory(context))
     val uiState = loginScreenVm.uiState
+    var passwordVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(key1 = Unit) {
         loginScreenVm.loginResults.collect {
@@ -105,8 +113,17 @@ fun LoginScreen(
             modifier = Modifier.fillMaxWidth(),
             label = { Text("Contraseña") },
             leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Password") },
-            visualTransformation = PasswordVisualTransformation(),
-            isError = uiState.passwordError != null || uiState.authError != null
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            isError = uiState.passwordError != null || uiState.authError != null,
+            trailingIcon = {
+                val image = if (passwordVisible)
+                    Icons.Filled.Visibility
+                else Icons.Filled.VisibilityOff
+
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, "Toggle password visibility")
+                }
+            }
         )
         AnimatedVisibility(
             visible = uiState.passwordError != null,

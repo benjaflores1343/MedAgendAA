@@ -33,6 +33,7 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
@@ -65,6 +66,8 @@ fun RegisterScreen(
     val state = registerScreenVm.state
     var showDatePicker by remember { mutableStateOf(false) }
     var showImageOptions by remember { mutableStateOf(false) }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var repeatedPasswordVisible by remember { mutableStateOf(false) }
 
     // --- Image Logic ---
     var tempImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -221,7 +224,21 @@ fun RegisterScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(value = state.password, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.PasswordChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Contraseña") }, leadingIcon = { Icon(Icons.Default.Lock, "Password") }, isError = state.passwordError != null, visualTransformation = PasswordVisualTransformation())
+        OutlinedTextField(
+            value = state.password,
+            onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.PasswordChanged(it)) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Contraseña") },
+            leadingIcon = { Icon(Icons.Default.Lock, "Password") },
+            isError = state.passwordError != null,
+            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                    Icon(imageVector = image, "Toggle password visibility")
+                }
+            }
+        )
         AnimatedVisibility(
             visible = state.passwordError != null,
             enter = slideInVertically { -it } + fadeIn(),
@@ -231,7 +248,21 @@ fun RegisterScreen(
         }
         Spacer(modifier = Modifier.height(16.dp))
 
-        OutlinedTextField(value = state.repeatedPassword, onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.RepeatedPasswordChanged(it)) }, modifier = Modifier.fillMaxWidth(), label = { Text("Repetir contraseña") }, leadingIcon = { Icon(Icons.Default.Lock, "Password") }, isError = state.repeatedPasswordError != null, visualTransformation = PasswordVisualTransformation())
+        OutlinedTextField(
+            value = state.repeatedPassword,
+            onValueChange = { registerScreenVm.onEvent(RegistrationFormEvent.RepeatedPasswordChanged(it)) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Repetir contraseña") },
+            leadingIcon = { Icon(Icons.Default.Lock, "Password") },
+            isError = state.repeatedPasswordError != null,
+            visualTransformation = if (repeatedPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+            trailingIcon = {
+                val image = if (repeatedPasswordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                IconButton(onClick = { repeatedPasswordVisible = !repeatedPasswordVisible }) {
+                    Icon(imageVector = image, "Toggle password visibility")
+                }
+            }
+        )
         AnimatedVisibility(
             visible = state.repeatedPasswordError != null,
             enter = slideInVertically { -it } + fadeIn(),
@@ -245,11 +276,7 @@ fun RegisterScreen(
             Checkbox(checked = state.acceptedTerms, onCheckedChange = { registerScreenVm.onEvent(RegistrationFormEvent.AcceptTerms(it)) })
             Text("Acepto los términos y condiciones")
         }
-        AnimatedVisibility(
-            visible = state.termsError != null,
-            enter = slideInVertically { -it } + fadeIn(),
-            exit = slideOutVertically { -it } + fadeOut()
-        ) {
+        AnimatedVisibility(visible = state.termsError != null) {
             state.termsError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 

@@ -1,6 +1,7 @@
 package com.example.medagenda.navigation
 
 sealed class Route(val definition: String) {
+    data object Splash : Route("splash")
     data object Login : Route("login")
     data object Register : Route("register")
 

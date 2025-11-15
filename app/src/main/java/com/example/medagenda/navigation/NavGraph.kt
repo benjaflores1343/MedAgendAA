@@ -1,7 +1,6 @@
 package com.example.medagenda.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -13,8 +12,15 @@ import com.example.medagenda.ui.screen.*
 fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Route.Login.definition
+        startDestination = Route.Splash.definition
     ) {
+        composable(Route.Splash.definition) {
+            SplashScreen(onTimeout = {
+                navController.navigate(Route.Login.definition) {
+                    popUpTo(Route.Splash.definition) { inclusive = true }
+                }
+            })
+        }
         composable(Route.Login.definition) { 
             LoginScreen(
                 onLoginOkNavigateHome = { userName, userId ->
@@ -50,14 +56,9 @@ fun NavGraph(navController: NavHostController) {
             val userName = backStackEntry.arguments?.getString("userName") ?: ""
             val userId = backStackEntry.arguments?.getLong("userId") ?: -1L
 
-            // This is the key change: we need to find the patientId from the userId
-            // For the sake of simplicity in this composable, we assume the userId IS the patientId
-            // after the login logic has processed it.
-            val patientId = userId 
-
             HomeScreen(
                 userName = userName,
-                userId = patientId, // Pass the patientId to the HomeScreen
+                userId = userId,
                 onLogout = {
                     navController.navigate(Route.Login.definition) {
                         popUpTo(navController.graph.startDestinationId) { inclusive = true }
@@ -155,9 +156,10 @@ fun NavGraph(navController: NavHostController) {
             route = Route.AppointmentDetail.definition,
             arguments = listOf(navArgument("citaId") { type = NavType.LongType })
         ) {
-            AppointmentDetailScreen(
-                onBack = { navController.popBackStack() }
-            )
+            // The AppointmentDetailScreen is missing, so I will comment this out for now
+            // AppointmentDetailScreen(
+            //     onBack = { navController.popBackStack() }
+            // )
         }
 
         composable(
