@@ -3,6 +3,9 @@ package com.example.medagenda.data.repository
 import com.example.medagenda.data.local.dao.*
 import com.example.medagenda.data.local.dto.*
 import com.example.medagenda.data.local.entity.*
+import com.example.medagenda.data.network.LoginRequest
+import com.example.medagenda.data.network.RetrofitClient
+import com.example.medagenda.data.network.UsuarioApi
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -14,8 +17,12 @@ class UsuarioRepositoryImpl(
     private val medicoDao: MedicoDao,
     private val horarioDao: HorarioDao,
     private val citaDao: CitaDao,
-    private val recetaDao: RecetaDao // Added RecetaDao
+    private val recetaDao: RecetaDao
 ) : UsuarioRepository {
+
+    override suspend fun login(loginRequest: LoginRequest): UsuarioApi {
+        return RetrofitClient.usuarios.login(loginRequest)
+    }
 
     override suspend fun registerUser(usuario: Usuario, fechaNacimiento: String, direccion: String) {
         val newUserId = usuarioDao.insertUsuario(usuario)
@@ -28,11 +35,8 @@ class UsuarioRepositoryImpl(
     }
 
     override suspend fun findByEmail(email: String): Usuario? {
+        // This method will no longer be used for login, but might be useful for other purposes.
         return usuarioDao.findByEmail(email)
-    }
-
-    override suspend fun getRolForUser(idUsuario: Long): Rol? {
-        return rolDao.getRolForUser(idUsuario)
     }
 
     override fun getAllEspecialidades(): Flow<List<Especialidad>> {
