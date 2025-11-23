@@ -3,9 +3,7 @@ package com.example.medagenda.data.repository
 import com.example.medagenda.data.local.dao.*
 import com.example.medagenda.data.local.dto.*
 import com.example.medagenda.data.local.entity.*
-import com.example.medagenda.data.network.LoginRequest
-import com.example.medagenda.data.network.RetrofitClient
-import com.example.medagenda.data.network.UsuarioApi
+import com.example.medagenda.data.network.*
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.Flow
 
@@ -20,18 +18,12 @@ class UsuarioRepositoryImpl(
     private val recetaDao: RecetaDao
 ) : UsuarioRepository {
 
-    override suspend fun login(loginRequest: LoginRequest): UsuarioApi {
+    override suspend fun login(loginRequest: LoginRequest): UserApiResponse {
         return RetrofitClient.usuarios.login(loginRequest)
     }
 
-    override suspend fun registerUser(usuario: Usuario, fechaNacimiento: String, direccion: String) {
-        val newUserId = usuarioDao.insertUsuario(usuario)
-        val pacienteRol = rolDao.findRolByName("Paciente")
-        pacienteRol?.let {
-            rolDao.assignRolToUser(UsuarioRol(idUsuario = newUserId, idRol = it.idRol))
-        }
-        val newPaciente = Paciente(idUsuario = newUserId, fechaNacimiento = fechaNacimiento, direccion = direccion)
-        pacienteDao.insertPaciente(newPaciente)
+    override suspend fun registerUser(registerRequest: RegisterRequest) {
+        RetrofitClient.usuarios.register(registerRequest)
     }
 
     override suspend fun findByEmail(email: String): Usuario? {
@@ -39,16 +31,16 @@ class UsuarioRepositoryImpl(
         return usuarioDao.findByEmail(email)
     }
 
-    override fun getAllEspecialidades(): Flow<List<Especialidad>> {
-        return especialidadDao.getAllEspecialidades()
+    override suspend fun getAllEspecialidades(): List<EspecialidadApi> {
+        return RetrofitClient.citas.getEspecialidades()
     }
 
-    override fun getMedicosByEspecialidad(idEspecialidad: Long): Flow<List<MedicoInfo>> {
-        return medicoDao.getMedicosByEspecialidad(idEspecialidad)
+    override suspend fun getMedicosByEspecialidad(idEspecialidad: Long): List<MedicoApi> {
+        return RetrofitClient.citas.getMedicosPorEspecialidad(idEspecialidad)
     }
 
-    override fun getAvailableHorariosForMedico(idMedico: Long): Flow<List<Horario>> {
-        return horarioDao.getAvailableHorariosForMedico(idMedico)
+    override suspend fun getAvailableHorariosForMedico(idMedico: Long): List<HorarioApi> {
+        return RetrofitClient.citas.getHorariosDisponibles(idMedico)
     }
 
     override suspend fun createAppointment(cita: Cita) {

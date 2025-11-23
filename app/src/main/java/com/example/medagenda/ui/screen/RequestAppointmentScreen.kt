@@ -1,5 +1,6 @@
 package com.example.medagenda.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.medagenda.data.network.EspecialidadApi
 import com.example.medagenda.di.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -26,15 +28,16 @@ fun RequestAppointmentScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("Solicitar Cita") })
+            TopAppBar(title = { Text("Solicitar Cita - Elige Especialidad") })
         }
     ) { paddingValues ->
         if (state.isLoading) {
-            Box(
-                modifier = Modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
+            }
+        } else if (state.error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Error: ${state.error}")
             }
         } else {
             LazyColumn(
@@ -43,35 +46,27 @@ fun RequestAppointmentScreen(
                     .padding(paddingValues)
                     .padding(16.dp)
             ) {
-                item {
-                    Text(
-                        text = "Seleccione una especialidad",
-                        style = MaterialTheme.typography.headlineSmall,
-                        modifier = Modifier.padding(bottom = 16.dp)
-                    )
-                }
                 items(state.especialidades) { especialidad ->
-                    SpecialtyCard(
-                        specialtyName = especialidad.nombreEspecialidad, 
-                        onClick = { onSpecialtySelected(especialidad.idEspecialidad, pacienteId) }
-                    )
+                    SpecialtyCard(especialidad = especialidad, onClick = {
+                        onSpecialtySelected(especialidad.idEspecialidad, pacienteId)
+                    })
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SpecialtyCard(specialtyName: String, onClick: () -> Unit) {
+private fun SpecialtyCard(especialidad: EspecialidadApi, onClick: () -> Unit) {
     Card(
-        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = specialtyName, style = MaterialTheme.typography.titleMedium)
+            Text(text = especialidad.nombreEspecialidad, style = MaterialTheme.typography.titleMedium)
+            Text(text = especialidad.descripcion, style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

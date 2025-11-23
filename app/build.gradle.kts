@@ -66,6 +66,10 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.material.icons.extended)
     implementation(libs.coil.compose)
+
+    // Retrofit
+    implementation(libs.retrofit)
+    implementation(libs.retrofit.converter.gson)
     
     // Room Database
     implementation(libs.androidx.room.runtime)

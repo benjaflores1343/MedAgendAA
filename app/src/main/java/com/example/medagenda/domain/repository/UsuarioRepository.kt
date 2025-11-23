@@ -2,17 +2,16 @@ package com.example.medagenda.domain.repository
 
 import com.example.medagenda.data.local.dto.*
 import com.example.medagenda.data.local.entity.*
-import com.example.medagenda.data.network.LoginRequest
-import com.example.medagenda.data.network.UsuarioApi
+import com.example.medagenda.data.network.*
 import kotlinx.coroutines.flow.Flow
 
 interface UsuarioRepository {
-    suspend fun login(loginRequest: LoginRequest): UsuarioApi
-    suspend fun registerUser(usuario: Usuario, fechaNacimiento: String, direccion: String)
+    suspend fun login(loginRequest: LoginRequest): UserApiResponse
+    suspend fun registerUser(registerRequest: RegisterRequest)
     suspend fun findByEmail(email: String): Usuario?
-    fun getAllEspecialidades(): Flow<List<Especialidad>>
-    fun getMedicosByEspecialidad(idEspecialidad: Long): Flow<List<MedicoInfo>>
-    fun getAvailableHorariosForMedico(idMedico: Long): Flow<List<Horario>>
+    suspend fun getAllEspecialidades(): List<EspecialidadApi>
+    suspend fun getMedicosByEspecialidad(idEspecialidad: Long): List<MedicoApi>
+    suspend fun getAvailableHorariosForMedico(idMedico: Long): List<HorarioApi>
     suspend fun createAppointment(cita: Cita)
     suspend fun findPacienteByUserId(idUsuario: Long): Paciente?
     fun getAppointmentsForPatient(patientId: Long): Flow<List<AppointmentInfo>>

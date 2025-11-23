@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.medagenda.data.network.LoginRequest
 import com.example.medagenda.domain.repository.UsuarioRepository
-import com.example.medagenda.domain.security.PasswordHasher
 import com.example.medagenda.domain.validation.ValidateEmail
 import com.example.medagenda.domain.validation.ValidatePassword
 import kotlinx.coroutines.channels.Channel
@@ -77,34 +77,24 @@ class LoginScreenVm(
         }
 
         viewModelScope.launch {
-            val user = usuarioRepository.findByEmail(uiState.email)
-            if (user == null) {
-                uiState = uiState.copy(authError = "Email o contraseña incorrectos")
-                return@launch
-            }
+            try {
+                val loginRequest = LoginRequest(uiState.email, uiState.password)
+                val user = usuarioRepository.login(loginRequest)
 
-            val hashedPassword = PasswordHasher.hashPassword(uiState.password)
-            if (hashedPassword != user.contrasenaHash) {
-                uiState = uiState.copy(authError = "Email o contraseña incorrectos")
-                return@launch
-            }
+                if (isDoctor && user.tipo == "Medico") {
+                    // The API doesn't return the medicoId, so for now we'll pass the userId.
+                    // We might need to adjust this later.
+                    resultChannel.send(LoginResult.DoctorSuccess(userName = user.nombre, medicoId = user.id))
+                } else if (!isDoctor && user.tipo == "Paciente") {
+                    // The API doesn't return the pacienteId, so for now we'll pass the userId.
+                    // We might need to adjust this later.
+                    resultChannel.send(LoginResult.Success(userName = user.nombre, userId = user.id))
+                } else {
+                    uiState = uiState.copy(authError = "Rol incorrecto para el tipo de inicio de sesión.")
+                }
 
-            if (isDoctor) {
-                // Doctor Login
-                val medico = usuarioRepository.findMedicoByUserId(user.idUsuario)
-                if (medico != null) {
-                    resultChannel.send(LoginResult.DoctorSuccess(userName = user.nombre, medicoId = medico.idMedico))
-                } else {
-                    uiState = uiState.copy(authError = "Este usuario no tiene un perfil de médico.")
-                }
-            } else {
-                // Patient Login: The HomeScreen will be responsible for finding the patient ID from the user ID.
-                val paciente = usuarioRepository.findPacienteByUserId(user.idUsuario)
-                if (paciente != null) {
-                    resultChannel.send(LoginResult.Success(userName = user.nombre, userId = user.idUsuario))
-                } else {
-                    uiState = uiState.copy(authError = "Este usuario no tiene un perfil de paciente.")
-                }
+            } catch (e: Exception) {
+                uiState = uiState.copy(authError = "Error de autenticación: ${e.message}")
             }
         }
     }

@@ -6,9 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medagenda.data.local.entity.Usuario
+import com.example.medagenda.data.network.RegisterRequest
 import com.example.medagenda.domain.repository.UsuarioRepository
-import com.example.medagenda.domain.security.PasswordHasher
 import com.example.medagenda.domain.validation.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -141,18 +140,22 @@ class RegisterScreenVm(
         }
         
         viewModelScope.launch {
-            val hashedPassword = PasswordHasher.hashPassword(state.password)
-            val newUser = Usuario(
-                rut = state.rut,
-                nombre = state.nombre,
-                apellido = state.apellido,
-                email = state.email,
-                telefono = state.telefono,
-                contrasenaHash = hashedPassword
-            )
-            
-            usuarioRepository.registerUser(newUser, state.fechaNacimiento, state.direccion)
-            validationEventChannel.send(ValidationEvent.Success)
+            try {
+                val registerRequest = RegisterRequest(
+                    nombre = state.nombre,
+                    apellido = state.apellido,
+                    rut = state.rut,
+                    telefono = state.telefono,
+                    fechaNacimiento = state.fechaNacimiento,
+                    direccion = state.direccion,
+                    email = state.email,
+                    contrasena = state.password
+                )
+                usuarioRepository.registerUser(registerRequest)
+                validationEventChannel.send(ValidationEvent.Success)
+            } catch (e: Exception) {
+                // Optionally, update the UI to show a generic registration error
+            }
         }
     }
 }

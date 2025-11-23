@@ -2,33 +2,37 @@ package com.example.medagenda.ui.screen
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medagenda.data.local.entity.Especialidad
+import com.example.medagenda.data.network.EspecialidadApi
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
 data class RequestAppointmentState(
-    val especialidades: List<Especialidad> = emptyList(),
-    val isLoading: Boolean = false
+    val especialidades: List<EspecialidadApi> = emptyList(),
+    val isLoading: Boolean = false,
+    val error: String? = null
 )
 
 class RequestAppointmentVm(
-    usuarioRepository: UsuarioRepository
+    private val usuarioRepository: UsuarioRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(RequestAppointmentState())
     val state: StateFlow<RequestAppointmentState> = _state.asStateFlow()
 
     init {
-        usuarioRepository.getAllEspecialidades()
-            .onStart { _state.update { it.copy(isLoading = true) } }
-            .onEach { especialidades ->
-                _state.update {
-                    it.copy(
-                        especialidades = especialidades,
-                        isLoading = false
-                    )
-                }
+        loadEspecialidades()
+    }
+
+    private fun loadEspecialidades() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            try {
+                val especialidades = usuarioRepository.getAllEspecialidades()
+                _state.update { it.copy(isLoading = false, especialidades = especialidades) }
+            } catch (e: Exception) {
+                _state.update { it.copy(isLoading = false, error = e.message) }
             }
-            .launchIn(viewModelScope)
+        }
     }
 }

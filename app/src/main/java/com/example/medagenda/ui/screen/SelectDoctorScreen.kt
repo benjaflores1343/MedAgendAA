@@ -1,5 +1,6 @@
 package com.example.medagenda.ui.screen
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,7 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medagenda.data.local.dto.MedicoInfo
+import com.example.medagenda.data.network.MedicoApi
 import com.example.medagenda.di.ViewModelFactory
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -44,6 +45,10 @@ fun SelectDoctorScreen(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
+        } else if (state.error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Error: ${state.error}")
+            }
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -62,18 +67,17 @@ fun SelectDoctorScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DoctorCard(doctor: MedicoInfo, onClick: () -> Unit) {
+private fun DoctorCard(doctor: MedicoApi, onClick: () -> Unit) {
     Card(
-        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(text = "${doctor.nombre} ${doctor.apellido}", style = MaterialTheme.typography.titleMedium)
-            Text(text = doctor.especialidad, style = MaterialTheme.typography.bodyMedium)
+            Text(text = doctor.biografia, style = MaterialTheme.typography.bodySmall)
         }
     }
 }

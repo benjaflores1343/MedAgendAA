@@ -7,8 +7,8 @@ object RetrofitClient {
 
     private const val BASE_URL_USUARIOS = "http://10.0.2.2:8081/"
     private const val BASE_URL_CITAS = "http://10.0.2.2:8082/"
-    private const val BASE_URL_CONSULTAS = "http://10.0.2.2:8083/"
-    private const val BASE_URL_NOTIFICACIONES = "http://10.0.2.2:8084/"
+    private const val BASE_URL_CONSULTAS = "http://10.0.2.2:8085/" // Corrected port
+    private const val BASE_URL_NOTIFICACIONES = "http://10.0.2.2:8086/" // Corrected port
 
     val usuarios: UsuariosApiService by lazy {
         Retrofit.Builder()
