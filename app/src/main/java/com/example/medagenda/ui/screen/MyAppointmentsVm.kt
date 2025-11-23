@@ -3,31 +3,43 @@ package com.example.medagenda.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medagenda.data.local.dto.AppointmentInfo
+import com.example.medagenda.data.network.AppointmentApiResponse
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
+
+data class MyAppointmentsState(
+    val isLoading: Boolean = false,
+    val appointments: List<AppointmentApiResponse> = emptyList(),
+    val error: String? = null
+)
 
 class MyAppointmentsVm(
-    usuarioRepository: UsuarioRepository,
+    private val usuarioRepository: UsuarioRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
+    private val _state = MutableStateFlow(MyAppointmentsState())
+    val state: StateFlow<MyAppointmentsState> = _state.asStateFlow()
 
-    private val patientId = savedStateHandle.getStateFlow("patientId", -1L)
-
-    val appointmentsState: StateFlow<List<AppointmentInfo>> = patientId.flatMapLatest { id ->
-        if (id != -1L) {
-            usuarioRepository.getAppointmentsForPatient(id)
-                .onStart { _isLoading.value = true } // Show loader when starting
-                .onEach { _isLoading.value = false } // Hide loader on first emission
+    init {
+        val patientId: Long? = savedStateHandle.get("patientId")
+        if (patientId != null) {
+            loadAppointments(patientId)
         } else {
-            flowOf(emptyList())
+            _state.update { it.copy(isLoading = false, error = "No se pudo obtener el ID del paciente.") }
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5_000L),
-        initialValue = emptyList()
-    )
+    }
+
+    private fun loadAppointments(patientId: Long) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            try {
+                val appointments = usuarioRepository.getAppointmentsForPatient(patientId)
+                _state.update { it.copy(isLoading = false, appointments = appointments) }
+            } catch (e: Exception) {
+                _state.update { it.copy(isLoading = false, error = e.message) }
+            }
+        }
+    }
 }

@@ -61,3 +61,42 @@ data class HorarioApi(
     val fechaHoraFin: String,
     val estado: String
 )
+
+/**
+ * Data class for the create appointment request body.
+ */
+data class CreateAppointmentRequest(
+    val idPaciente: Long,
+    val idMedico: Long,
+    val idHorario: Long
+)
+
+/**
+ * Data class for the patient's appointment information from the API.
+ */
+data class AppointmentApiResponse(
+    val idCita: Long,
+    val fechaHoraInicio: String,
+    val nombreMedico: String,
+    val apellidoMedico: String,
+    val nombreEspecialidad: String,
+    val estadoCita: String
+)
+
+/**
+ * Data class for the doctor's appointment information from the API.
+ */
+data class DoctorAppointmentApiResponse(
+    val idCita: Long,
+    val fechaHoraInicio: String,
+    val nombrePaciente: String,
+    val apellidoPaciente: String,
+    val estadoCita: String
+)
+
+/**
+ * Data class for updating the appointment status.
+ */
+data class UpdateAppointmentStatusRequest(
+    val estado: String
+)

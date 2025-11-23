@@ -12,9 +12,9 @@ interface UsuarioRepository {
     suspend fun getAllEspecialidades(): List<EspecialidadApi>
     suspend fun getMedicosByEspecialidad(idEspecialidad: Long): List<MedicoApi>
     suspend fun getAvailableHorariosForMedico(idMedico: Long): List<HorarioApi>
-    suspend fun createAppointment(cita: Cita)
+    suspend fun createAppointment(createAppointmentRequest: CreateAppointmentRequest)
     suspend fun findPacienteByUserId(idUsuario: Long): Paciente?
-    fun getAppointmentsForPatient(patientId: Long): Flow<List<AppointmentInfo>>
+    suspend fun getAppointmentsForPatient(patientId: Long): List<AppointmentApiResponse>
     suspend fun findMedicoByUserId(idUsuario: Long): Medico?
     fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>>
     suspend fun getAppointmentDetails(citaId: Long): AppointmentFullDetails?

@@ -1,6 +1,6 @@
 package com.example.medagenda.ui.screen
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -9,16 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.Card
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,21 +19,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medagenda.data.local.dto.AppointmentInfo
+import com.example.medagenda.data.network.AppointmentApiResponse
 import com.example.medagenda.di.ViewModelFactory
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyAppointmentsScreen(
     onGoToAppointmentDetail: (Long) -> Unit,
-    onBack: () -> Unit,
+    onBack: () -> Unit
 ) {
     val context = LocalContext.current
     val vm: MyAppointmentsVm = viewModel(factory = ViewModelFactory(context))
-    val appointments by vm.appointmentsState.collectAsState()
-    val isLoading by vm.isLoading.collectAsState() // Assuming you add this to your VM
+    val state by vm.state.collectAsState()
 
     Scaffold(
         topBar = {
@@ -49,71 +38,50 @@ fun MyAppointmentsScreen(
                 title = { Text("Mis Citas") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
                     }
                 }
             )
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
-            } else if (appointments.isEmpty()) {
-                Text(
-                    text = "Todavía no tienes ninguna cita.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            } else {
-                LazyColumn(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                    items(appointments) { appointment ->
-                        AppointmentCard(
-                            appointment = appointment,
-                            onCardClicked = { onGoToAppointmentDetail(appointment.idCita) }
-                        )
-                    }
+        if (state.isLoading) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        } else if (state.error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Error: ${state.error}")
+            }
+        } else {
+            LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+            ) {
+                items(state.appointments) { appointment ->
+                    AppointmentCard(appointment = appointment, onClick = {
+                        onGoToAppointmentDetail(appointment.idCita)
+                    })
                 }
             }
         }
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AppointmentCard(
-    appointment: AppointmentInfo,
-    onCardClicked: () -> Unit,
-) {
-    val formatter = SimpleDateFormat("EEEE, dd MMMM yyyy, HH:mm", Locale("es", "ES"))
-    val startTime = formatter.format(appointment.fechaHoraInicio)
-
+private fun AppointmentCard(appointment: AppointmentApiResponse, onClick: () -> Unit) {
     Card(
-        onClick = onCardClicked, 
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(
-                text = startTime,
-                style = MaterialTheme.typography.titleLarge
-            )
-            Text(
-                text = "Dr. ${appointment.nombreMedico} ${appointment.apellidoMedico}",
-                style = MaterialTheme.typography.titleMedium
-            )
-            Text(
-                text = appointment.nombreEspecialidad,
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Estado: ${appointment.estadoCita}",
-                style = MaterialTheme.typography.bodySmall,
-                color = if (appointment.estadoCita == "Cancelada") MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
-            )
+            Text(text = "Dr. ${appointment.nombreMedico} ${appointment.apellidoMedico}", style = MaterialTheme.typography.titleMedium)
+            Text(text = appointment.nombreEspecialidad, style = MaterialTheme.typography.bodyMedium)
+            Text(text = "Fecha: ${appointment.fechaHoraInicio}", style = MaterialTheme.typography.bodySmall)
+            Text(text = "Estado: ${appointment.estadoCita}", style = MaterialTheme.typography.bodySmall)
         }
     }
 }

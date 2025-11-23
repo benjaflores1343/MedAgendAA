@@ -22,6 +22,12 @@ interface CitasApiService {
 
     @GET("horarios/disponibles/{idMedico}")
     suspend fun getHorariosDisponibles(@Path("idMedico") medicoId: Long): List<HorarioApi>
+
+    @POST("citas")
+    suspend fun createAppointment(@Body createAppointmentRequest: CreateAppointmentRequest)
+
+    @GET("citas/paciente/{id}")
+    suspend fun getAppointmentsForPatient(@Path("id") patientId: Long): List<AppointmentApiResponse>
 }
 
 interface ConsultasApiService {

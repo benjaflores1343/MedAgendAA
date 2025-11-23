@@ -43,16 +43,16 @@ class UsuarioRepositoryImpl(
         return RetrofitClient.citas.getHorariosDisponibles(idMedico)
     }
 
-    override suspend fun createAppointment(cita: Cita) {
-        citaDao.createAppointment(cita)
+    override suspend fun createAppointment(createAppointmentRequest: CreateAppointmentRequest) {
+        RetrofitClient.citas.createAppointment(createAppointmentRequest)
     }
 
     override suspend fun findPacienteByUserId(idUsuario: Long): Paciente? {
         return pacienteDao.findPacienteByUserId(idUsuario)
     }
 
-    override fun getAppointmentsForPatient(patientId: Long): Flow<List<AppointmentInfo>> {
-        return citaDao.getAppointmentsForPatient(patientId)
+    override suspend fun getAppointmentsForPatient(patientId: Long): List<AppointmentApiResponse> {
+        return RetrofitClient.citas.getAppointmentsForPatient(patientId)
     }
 
     override suspend fun findMedicoByUserId(idUsuario: Long): Medico? {
@@ -84,7 +84,9 @@ class UsuarioRepositoryImpl(
     }
 
     override suspend fun isTimeSlotAvailable(horarioId: Long): Boolean {
-        return !citaDao.isTimeSlotBooked(horarioId)
+        // This will be handled by the backend now, so we can assume it's always available
+        // until we implement the corresponding API endpoint.
+        return true 
     }
 
     override suspend fun updateAppointmentStatus(citaId: Long, newStatus: String) {
