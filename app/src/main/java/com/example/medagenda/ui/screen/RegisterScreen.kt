@@ -280,6 +280,14 @@ fun RegisterScreen(
             state.termsError?.let { Text(text = it, color = MaterialTheme.colorScheme.error) }
         }
 
+        // Display general registration error
+        AnimatedVisibility(visible = state.registrationError != null) {
+            state.registrationError?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = it, color = MaterialTheme.colorScheme.error)
+            }
+        }
+
         Spacer(modifier = Modifier.height(16.dp))
 
         Button(onClick = { registerScreenVm.onEvent(RegistrationFormEvent.Submit) }, modifier = Modifier.fillMaxWidth()) { Text("Registrarse") }

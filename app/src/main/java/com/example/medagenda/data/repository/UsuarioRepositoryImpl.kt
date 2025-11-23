@@ -59,28 +59,28 @@ class UsuarioRepositoryImpl(
         return medicoDao.findMedicoByUserId(idUsuario)
     }
 
-    override fun getAppointmentsForDoctor(medicoId: Long): Flow<List<DoctorAppointmentInfo>> {
-        return citaDao.getAppointmentsForDoctor(medicoId)
+    override suspend fun getAppointmentsForDoctor(medicoId: Long): List<DoctorAppointmentApiResponse> {
+        return RetrofitClient.citas.getAppointmentsForDoctor(medicoId)
     }
 
-    override suspend fun getAppointmentDetails(citaId: Long): AppointmentFullDetails? {
-        return citaDao.getAppointmentDetails(citaId)
+    override suspend fun getAppointmentDetails(citaId: Long): AppointmentDetailApiResponse {
+        return RetrofitClient.citas.getAppointmentDetails(citaId)
     }
 
     override fun getAllUsersWithRoles(): Flow<List<UserInfo>> {
         return usuarioDao.getAllUsersWithRoles()
     }
 
-    override suspend fun saveReceta(receta: Receta) {
-        recetaDao.insertReceta(receta)
+    override suspend fun saveReceta(createRecetaRequest: CreateRecetaRequest) {
+        RetrofitClient.consultas.createReceta(createRecetaRequest)
     }
 
-    override fun getRecetasForPaciente(idPaciente: Long): Flow<List<Receta>> {
-        return recetaDao.getRecetasForPaciente(idPaciente)
+    override suspend fun getRecetasForPaciente(patientId: Long): List<RecetaApiResponse> {
+        return RetrofitClient.consultas.getRecetas(patientId)
     }
 
-    override suspend fun deleteRecetas(recetaIds: List<Long>) {
-        recetaDao.deleteRecetasByIds(recetaIds)
+    override suspend fun deleteRecetas(deleteRecetasRequest: DeleteRecetasRequest) {
+        RetrofitClient.consultas.deleteRecetas(deleteRecetasRequest)
     }
 
     override suspend fun isTimeSlotAvailable(horarioId: Long): Boolean {
@@ -90,6 +90,7 @@ class UsuarioRepositoryImpl(
     }
 
     override suspend fun updateAppointmentStatus(citaId: Long, newStatus: String) {
-        citaDao.updateAppointmentStatus(citaId, newStatus)
+        val request = UpdateAppointmentStatusRequest(estado = newStatus)
+        RetrofitClient.citas.updateAppointmentStatus(citaId, request)
     }
 }

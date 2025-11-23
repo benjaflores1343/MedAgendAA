@@ -3,14 +3,18 @@ package com.example.medagenda.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medagenda.data.local.dto.AppointmentFullDetails
+import com.example.medagenda.data.network.AppointmentDetailApiResponse
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-// The AppointmentDetailState data class is now defined in AppointmentDetailVm.kt
-// and will be shared by both ViewModels.
+// This is now the single source of truth for the appointment detail state.
+data class AppointmentDetailState(
+    val isLoading: Boolean = true,
+    val appointment: AppointmentDetailApiResponse? = null,
+    val error: String? = null
+)
 
 class DoctorAppointmentDetailViewModel(
     private val usuarioRepository: UsuarioRepository,

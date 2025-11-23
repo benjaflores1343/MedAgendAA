@@ -3,7 +3,7 @@ package com.example.medagenda.ui.screen
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medagenda.data.local.entity.Receta
+import com.example.medagenda.data.network.CreateRecetaRequest
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,8 +33,8 @@ class CameraViewModel(private val repository: UsuarioRepository) : ViewModel() {
         viewModelScope.launch {
             _state.value = _state.value.copy(isSaving = true)
             try {
-                val receta = Receta(idPaciente = pacienteId, uriFoto = uri.toString())
-                repository.saveReceta(receta)
+                val request = CreateRecetaRequest(idPaciente = pacienteId, uriFoto = uri.toString())
+                repository.saveReceta(request)
                 _state.value = _state.value.copy(isSaving = false, saveResult = Result.success(Unit))
             } catch (e: Exception) {
                 _state.value = _state.value.copy(isSaving = false, saveResult = Result.failure(e))

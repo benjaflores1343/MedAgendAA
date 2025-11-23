@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import com.example.medagenda.data.local.database.MedAgendaDatabase
-import com.example.medagenda.data.repository.MedicoRepository
 import com.example.medagenda.data.repository.UsuarioRepositoryImpl
 import com.example.medagenda.domain.repository.UsuarioRepository
 import com.example.medagenda.ui.screen.*
@@ -26,7 +25,6 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
             db.citaDao(),
             db.recetaDao()
         )
-        val medicoRepository = MedicoRepository(db.medicoDao())
         val savedStateHandle = extras.createSavedStateHandle()
 
         return when {
@@ -40,7 +38,7 @@ class ViewModelFactory(private val context: Context) : ViewModelProvider.Factory
                 RequestAppointmentVm(usuarioRepository) as T
             }
             modelClass.isAssignableFrom(SelectDoctorViewModel::class.java) -> {
-                SelectDoctorViewModel(medicoRepository) as T
+                SelectDoctorViewModel(usuarioRepository) as T
             }
             modelClass.isAssignableFrom(SelectTimeSlotViewModel::class.java) -> {
                 SelectTimeSlotViewModel(usuarioRepository) as T

@@ -12,6 +12,7 @@ import com.example.medagenda.domain.validation.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import retrofit2.HttpException
 
 data class RegistrationFormState(
     // User info
@@ -38,7 +39,8 @@ data class RegistrationFormState(
     // Other
     val acceptedTerms: Boolean = false,
     val termsError: String? = null,
-    val profileImageUri: Uri? = null
+    val profileImageUri: Uri? = null,
+    val registrationError: String? = null // Added for general registration errors
 )
 
 sealed class ValidationEvent {
@@ -65,6 +67,9 @@ class RegisterScreenVm(
     val validationEvents = validationEventChannel.receiveAsFlow()
 
     fun onEvent(event: RegistrationFormEvent) {
+        // Clear general registration error on any change
+        state = state.copy(registrationError = null)
+
         when (event) {
             is RegistrationFormEvent.NombreChanged -> {
                 state = state.copy(nombre = event.nombre, nombreError = null)
@@ -149,28 +154,17 @@ class RegisterScreenVm(
                     fechaNacimiento = state.fechaNacimiento,
                     direccion = state.direccion,
                     email = state.email,
-                    contrasena = state.password
+                    contrasena = state.password,
+                    tipo = "Paciente"
                 )
                 usuarioRepository.registerUser(registerRequest)
                 validationEventChannel.send(ValidationEvent.Success)
+            } catch (e: HttpException) {
+                val errorBody = e.response()?.errorBody()?.string() ?: "Error de red. Inténtalo de nuevo."
+                state = state.copy(registrationError = errorBody)
             } catch (e: Exception) {
-                // Optionally, update the UI to show a generic registration error
+                state = state.copy(registrationError = e.message ?: "Error desconocido en el registro.")
             }
         }
     }
-}
-
-sealed class RegistrationFormEvent {
-    data class NombreChanged(val nombre: String) : RegistrationFormEvent()
-    data class ApellidoChanged(val apellido: String) : RegistrationFormEvent()
-    data class RutChanged(val rut: String) : RegistrationFormEvent()
-    data class TelefonoChanged(val telefono: String) : RegistrationFormEvent()
-    data class FechaNacimientoChanged(val fechaNacimiento: String) : RegistrationFormEvent()
-    data class DireccionChanged(val direccion: String) : RegistrationFormEvent()
-    data class EmailChanged(val email: String) : RegistrationFormEvent()
-    data class PasswordChanged(val password: String) : RegistrationFormEvent()
-    data class RepeatedPasswordChanged(val repeatedPassword: String) : RegistrationFormEvent()
-    data class AcceptTerms(val isAccepted: Boolean) : RegistrationFormEvent()
-    data class ProfileImageChanged(val uri: Uri?) : RegistrationFormEvent()
-    object Submit : RegistrationFormEvent()
 }

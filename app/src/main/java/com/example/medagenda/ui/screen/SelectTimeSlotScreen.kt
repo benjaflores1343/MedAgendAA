@@ -1,6 +1,6 @@
 package com.example.medagenda.ui.screen
 
-import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,11 +18,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.medagenda.data.local.entity.Horario
+import com.example.medagenda.data.network.HorarioApi
 import com.example.medagenda.di.ViewModelFactory
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -40,14 +37,7 @@ fun SelectTimeSlotScreen(
     }
 
     LaunchedEffect(state.bookingResult) {
-        state.bookingResult?.let {
-            if (it.isSuccess) {
-                Toast.makeText(context, "Cita reservada con éxito", Toast.LENGTH_SHORT).show()
-                onBookingConfirmed()
-            } else {
-                Toast.makeText(context, "Error al reservar la cita", Toast.LENGTH_SHORT).show()
-            }
-        }
+        state.bookingResult?.onSuccess { onBookingConfirmed() }
     }
 
     Scaffold(
@@ -59,6 +49,10 @@ fun SelectTimeSlotScreen(
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
+        } else if (state.error != null) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Text(text = "Error: ${state.error}")
+            }
         } else {
             LazyColumn(
                 modifier = Modifier
@@ -68,11 +62,7 @@ fun SelectTimeSlotScreen(
             ) {
                 items(state.timeSlots) { timeSlot ->
                     TimeSlotCard(timeSlot = timeSlot, onClick = {
-                        vm.bookAppointment(
-                            pacienteId = pacienteId,
-                            timeSlot = timeSlot,
-                            medicoId = medicoId
-                        )
+                        vm.bookAppointment(pacienteId, timeSlot, medicoId)
                     })
                 }
             }
@@ -80,21 +70,17 @@ fun SelectTimeSlotScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun TimeSlotCard(timeSlot: Horario, onClick: () -> Unit) {
-    val date = Date(timeSlot.fechaHoraInicio)
-    val formatter = SimpleDateFormat("EEEE, dd 'de' MMMM, HH:mm", Locale.getDefault())
-    val formattedDate = formatter.format(date)
-
+private fun TimeSlotCard(timeSlot: HorarioApi, onClick: () -> Unit) {
     Card(
-        onClick = onClick,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
+            .clickable(onClick = onClick)
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(text = formattedDate, style = MaterialTheme.typography.titleMedium)
+            Text(text = "De: ${timeSlot.fechaHoraInicio}", style = MaterialTheme.typography.titleMedium)
+            Text(text = "A: ${timeSlot.fechaHoraFin}", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

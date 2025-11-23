@@ -4,7 +4,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -16,14 +16,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.medagenda.di.ViewModelFactory
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppointmentDetailScreen(onBack: () -> Unit) {
     val context = LocalContext.current
-    val vm: AppointmentDetailVm = viewModel(factory = ViewModelFactory(context))
+    // Use the unified ViewModel
+    val vm: DoctorAppointmentDetailViewModel = viewModel(factory = ViewModelFactory(context))
     val state by vm.state.collectAsState()
 
     Scaffold(
@@ -32,7 +31,7 @@ fun AppointmentDetailScreen(onBack: () -> Unit) {
                 title = { Text("Detalle de la Cita") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Atrás")
                     }
                 }
             )
@@ -57,14 +56,13 @@ fun AppointmentDetailScreen(onBack: () -> Unit) {
                 }
                 state.appointment != null -> {
                     val appointment = state.appointment!!
-                    val dateFormatter = SimpleDateFormat("EEEE, dd MMMM yyyy", Locale("es", "ES"))
-                    val timeFormatter = SimpleDateFormat("HH:mm", Locale.getDefault())
 
                     Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                         // Appointment Details
                         SectionTitle("Datos de la Cita")
-                        DetailRow("Fecha:", dateFormatter.format(appointment.fechaHoraInicio))
-                        DetailRow("Hora:", "${timeFormatter.format(appointment.fechaHoraInicio)} - ${timeFormatter.format(appointment.fechaHoraFin)}")
+                        // Display date/time strings directly from the API response
+                        DetailRow("Fecha:", appointment.fechaHoraInicio.substringBefore("T"))
+                        DetailRow("Hora:", "${appointment.fechaHoraInicio.substringAfter("T")} - ${appointment.fechaHoraFin.substringAfter("T")}")
                         DetailRow("Especialidad:", appointment.nombreEspecialidad)
                         DetailRow("Estado:", appointment.estadoCita)
                         Spacer(modifier = Modifier.height(24.dp))
@@ -94,7 +92,7 @@ private fun SectionTitle(title: String) {
         style = MaterialTheme.typography.titleLarge,
         modifier = Modifier.padding(bottom = 8.dp)
     )
-    Divider()
+    HorizontalDivider()
     Spacer(modifier = Modifier.height(8.dp))
 }
 

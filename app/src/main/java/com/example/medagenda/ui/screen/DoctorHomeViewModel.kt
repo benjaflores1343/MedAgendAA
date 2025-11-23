@@ -3,14 +3,14 @@ package com.example.medagenda.ui.screen
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.medagenda.data.local.dto.DoctorAppointmentInfo
+import com.example.medagenda.data.network.DoctorAppointmentApiResponse
 import com.example.medagenda.domain.repository.UsuarioRepository
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
 data class DoctorHomeState(
     val isLoading: Boolean = false,
-    val appointments: List<DoctorAppointmentInfo> = emptyList(),
+    val appointments: List<DoctorAppointmentApiResponse> = emptyList(),
     val error: String? = null
 )
 
@@ -24,22 +24,28 @@ class DoctorHomeViewModel(
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val medicoId = savedStateHandle.getStateFlow("medicoId", -1L)
+    private val _state = MutableStateFlow(DoctorHomeState())
+    val state: StateFlow<DoctorHomeState> = _state.asStateFlow()
 
-    val state: StateFlow<DoctorHomeState> = medicoId.flatMapLatest { id ->
-        if (id != -1L) {
-            usuarioRepository.getAppointmentsForDoctor(id)
-                .map { appointments -> DoctorHomeState(isLoading = false, appointments = appointments) }
-                .onStart { emit(DoctorHomeState(isLoading = true)) }
-                .catch { e -> emit(DoctorHomeState(isLoading = false, error = e.message)) }
-        } else {
-            flowOf(DoctorHomeState(isLoading = false, error = "No se pudo obtener el ID del médico"))
+    private val medicoId: Long? = savedStateHandle.get("medicoId")
+
+    init {
+        loadAppointments()
+    }
+
+    private fun loadAppointments() {
+        medicoId?.let {
+            viewModelScope.launch {
+                _state.update { it.copy(isLoading = true) }
+                try {
+                    val appointments = usuarioRepository.getAppointmentsForDoctor(it)
+                    _state.update { s -> s.copy(isLoading = false, appointments = appointments) }
+                } catch (e: Exception) {
+                    _state.update { s -> s.copy(isLoading = false, error = e.message) }
+                }
+            }
         }
-    }.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000L),
-        initialValue = DoctorHomeState(isLoading = true)
-    )
+    }
 
     fun onEvent(event: DoctorHomeEvent) {
         when (event) {
@@ -56,8 +62,10 @@ class DoctorHomeViewModel(
         viewModelScope.launch {
             try {
                 usuarioRepository.updateAppointmentStatus(citaId, status)
+                // Refresh the list of appointments after updating the status
+                loadAppointments()
             } catch (e: Exception) {
-                // Handle error, maybe update the UI to show an error message
+                _state.update { it.copy(error = "Error al actualizar el estado de la cita.") }
             }
         }
     }

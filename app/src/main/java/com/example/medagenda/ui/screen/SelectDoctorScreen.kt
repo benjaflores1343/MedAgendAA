@@ -57,8 +57,7 @@ fun SelectDoctorScreen(
                     .padding(16.dp)
             ) {
                 items(state.doctors) { doctor ->
-                    DoctorCard(
-                        doctor = doctor, 
+                    DoctorCard(                        doctor = doctor, 
                         onClick = { onDoctorSelected(doctor.idMedico, pacienteId) }
                     )
                 }

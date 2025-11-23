@@ -29,7 +29,8 @@ data class RegisterRequest(
     val fechaNacimiento: String,
     val direccion: String,
     val email: String,
-    val contrasena: String
+    val contrasena: String,
+    val tipo: String = "Paciente" // Added mandatory field
 )
 
 /**
@@ -99,4 +100,49 @@ data class DoctorAppointmentApiResponse(
  */
 data class UpdateAppointmentStatusRequest(
     val estado: String
+)
+
+/**
+ * Data class for the full appointment details from the API.
+ */
+data class AppointmentDetailApiResponse(
+    val idCita: Long,
+    val fechaHoraInicio: String,
+    val fechaHoraFin: String,
+    val estadoCita: String,
+    val nombrePaciente: String,
+    val apellidoPaciente: String,
+    val emailPaciente: String,
+    val telefonoPaciente: String,
+    val nombreMedico: String,
+    val apellidoMedico: String,
+    val emailMedico: String,
+    val nombreEspecialidad: String
+)
+
+// --- Recipe Models ---
+
+/**
+ * Data class for the recipe information from the API.
+ */
+data class RecetaApiResponse(
+    val idReceta: Long,
+    val idPaciente: Long,
+    val uriFoto: String,
+    val fechaCreacion: String
+)
+
+/**
+ * Data class for creating a new recipe.
+ */
+data class CreateRecetaRequest(
+    val idPaciente: Long,
+    val uriFoto: String
+)
+
+/**
+ * Data class for deleting recipes.
+ */
+data class DeleteRecetasRequest(
+    val recetaIds: List<Long>
 )
